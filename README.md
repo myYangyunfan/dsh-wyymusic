@@ -55,6 +55,8 @@ node -e "require('fs').symlinkSync(require('node:path').resolve('.'), process.en
 
 > ⚠️ 该 profile 是 `nodeLinker: hoisted` 且 `dependencies` 里只有 `@dsh-pack/all`：**下次从插件页装/卸任何东西时，pnpm 会把不在依赖图里的 `node_modules` 条目清掉**，junction 被剪掉 —— 现象是重启后入口消失，重跑上面那条即可。
 
+> ⚠️ 覆盖**同一个路径**的 `.tgz` 后重装，pnpm 会说 `Already up to date` 不刷新（实测：先 `pnpm remove dsh-wyymusic` 再 add 才换新）。版本号变了就是新路径，不受影响。
+
 > 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内，不监听本地端口，没法直接 curl 它验；要单独跑起来验见下方「开发自检」。
 
 ## 宿主路由
