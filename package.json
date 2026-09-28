@@ -28,6 +28,14 @@
     "wyymusic"
   ],
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myYangyunfan/dsh-wyymusic.git"
+  },
+  "homepage": "https://github.com/myYangyunfan/dsh-wyymusic#readme",
+  "bugs": {
+    "url": "https://github.com/myYangyunfan/dsh-wyymusic/issues"
+  },
   "engines": {
     "node": ">=20"
   },
