@@ -26,18 +26,36 @@
 
 ## 安装
 
-包要能被 profile 解析到。用 junction（改 repo 后不必重装）：
+前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供；已实测 0.1.7-rc.2）。
+包零运行时依赖 —— `react` 是 peer、`@deepseek-ai/dsh-client-ui-slots` 是宿主注入，都不用另装。
+
+在应用的**设置 → 插件**里填安装源（或让 agent 用 `plugin_manager` 装），装完**重启应用**
+（页内注入清单只在宿主 ready 时抓一次，刷新页面无效）。内核接受的写法与实测结论：
+
+| 安装源 | 内核认成 | 说明 |
+| --- | --- | --- |
+| `github:myYangyunfan/dsh-wyymusic` | git | 可加 `#分支/标签` |
+| `https://github.com/myYangyunfan/dsh-wyymusic` | git | 可加 `#分支/标签` |
+| `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
+| `dsh-wyymusic` | npm registry | **尚未发布**，现在装会 404 |
+| `<绝对路径>/dsh-wyymusic-0.2.0.tgz` | tarball | `npm pack` 的产物，见下 |
+
+> ⚠️ git 源由 pnpm 经 `codeload.github.com` 拉包。实测**本机**这条线不通（`github.com` 的 git 协议正常、`codeload` 20s 超时），
+> 所以本机装请用 tarball：`npm pack` 出 `dsh-wyymusic-0.2.0.tgz`，把它的**绝对路径**填进插件页。codeload 通的机器上三种 git 写法都能用。
+
+### 开发联调：repo 直挂
+
+改 repo 立即生效、不必重装（本机开发用）。把 repo 挂进 profile 的 `node_modules`：
 
 ```sh
-node -e "require('fs').symlinkSync('C:/Users/delinger/Desktop/dsh-wyymusic', process.env.USERPROFILE + '/.dsh/profiles/desktop/node_modules/dsh-wyymusic','junction')"
+node -e "require('fs').symlinkSync(require('node:path').resolve('.'), process.env.USERPROFILE + '/.dsh/profiles/desktop/node_modules/dsh-wyymusic','junction')"
 ```
 
-再把包名加进 `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles`，然后**重启应用**（页内注入清单只在宿主 ready 时抓一次，刷新页面无效）。
+再把包名加进 `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles`，重启应用。
 
-> ⚠️ 该 profile 是 `nodeLinker: hoisted`，且 `dependencies` 里只有 `@dsh-pack/all`。**下次从插件页装/卸任何东西时，pnpm 会把不在依赖图里的 `node_modules` 条目清掉**，junction 会被剪掉 —— 现象是重启后入口消失。重跑上面那条 junction 命令即可。
-> 想让它彻底不被剪，得像 `graph-memory` 那样在 `dependencies` 里声明 `"dsh-wyymusic": "link:..."`；但那需要一次成功的 `pnpm install` 同步 lockfile，而当前 profile 里陈旧的 `@dsh-pack/all@^0.1.0` 声明会让任何 install 整单回滚（背景见 dsh-pack 仓库的 `packs/INSTALL.md` §3，即 `~/Desktop/dsh/packs/INSTALL.md`）。所以**先做 0.2.x 迁移，再决定要不要正式声明**。
+> ⚠️ 该 profile 是 `nodeLinker: hoisted` 且 `dependencies` 里只有 `@dsh-pack/all`：**下次从插件页装/卸任何东西时，pnpm 会把不在依赖图里的 `node_modules` 条目清掉**，junction 被剪掉 —— 现象是重启后入口消失，重跑上面那条即可。
 
-> 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内，不监听本地端口，所以没法直接 curl 它验；要单独跑起来验请见下方「开发自检」。
+> 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内，不监听本地端口，没法直接 curl 它验；要单独跑起来验见下方「开发自检」。
 
 ## 宿主路由
 
