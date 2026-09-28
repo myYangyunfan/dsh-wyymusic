@@ -1,5 +1,7 @@
 # dsh-wyymusic
 
+**简体中文** | [English](README.en.md)
+
 在 DeepSeek Harness 侧栏加一个独立入口「网易云音乐」，点开后**全屏接管主区域**，是一套自研的网易云音乐播放界面（不是 TUI、不是外链、不是官方客户端套壳）。
 
 - 位置：侧栏 `sidebar.panellist`，`order: -1`，排在「插件」(=0) **之上**
@@ -7,22 +9,6 @@
 - 音乐能力：**不调 CLI**。宿主半边直接走网易云 weapi/linuxapi/eapi，浏览器半边只打宿主的同源路由
 
 支持的内核：`@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供）。已实测 0.1.7-rc.2。
-
-## 结构
-
-| 半边 | 文件 | 职责 |
-| --- | --- | --- |
-| 宿主 | `lib/index.js` | `/wyymusic/*` 路由、登录态落盘、上游代理、音频流代理 |
-| 宿主 | `lib/netease.js` | 网易云接口层（移植自 MIT 的 `dsh-music-player`，见 `LICENSE.dsh-music-player.txt`） |
-| 宿主 | `lib/yrc.js` | 逐字歌词（YRC）解析 |
-| 宿主 | `lib/fetch-limit.js` | 并发/速率限制 |
-| 客户端 | `lib/client.js` | 侧栏图标 + 全屏 GUI（发现 / 排行榜 / 我的歌单 / 搜索 / 播放条 / 歌词） |
-| 客户端 | `lib/vendor/qrcode.mjs` | 扫码登录二维码 |
-
-仓库里另外两块：`design/`（原型 `proto.html` + 视觉方案 UI-PLAN.md + 差距台账 UI-GAP-LEDGER.md +
-氛围架构 AMBIENT.md + `shots/` 截图证据）、`scripts/`（四条自检腿 + 一次性探针 `probe-seek.mjs`）。
-
-`dsh.plugin.json` / `cordis.patch.yml` 是自装载声明：包自己往 loader 插一行 `dsh-wyymusic`，**不写 profile 的 patch 层**。
 
 ## 安装
 
@@ -57,7 +43,23 @@ node -e "require('fs').symlinkSync(require('node:path').resolve('.'), process.en
 
 > ⚠️ 覆盖**同一个路径**的 `.tgz` 后重装，pnpm 会说 `Already up to date` 不刷新（实测：先 `pnpm remove dsh-wyymusic` 再 add 才换新）。版本号变了就是新路径，不受影响。
 
-> 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内，不监听本地端口，没法直接 curl 它验；要单独跑起来验见下方「开发自检」。
+> 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内，不监听本地端口，没法直接 curl 它验；要单独跑起来验见下方「自检」。
+
+## 结构
+
+| 半边 | 文件 | 职责 |
+| --- | --- | --- |
+| 宿主 | `lib/index.js` | `/wyymusic/*` 路由、登录态落盘、上游代理、音频流代理 |
+| 宿主 | `lib/netease.js` | 网易云接口层（移植自 MIT 的 `dsh-music-player`，见 `LICENSE.dsh-music-player.txt`） |
+| 宿主 | `lib/yrc.js` | 逐字歌词（YRC）解析 |
+| 宿主 | `lib/fetch-limit.js` | 并发/速率限制 |
+| 客户端 | `lib/client.js` | 侧栏图标 + 全屏 GUI（发现 / 排行榜 / 我的歌单 / 搜索 / 播放条 / 歌词） |
+| 客户端 | `lib/vendor/qrcode.mjs` | 扫码登录二维码 |
+
+仓库里另外两块：`design/`（原型 `proto.html` + 视觉方案 UI-PLAN.md + 差距台账 UI-GAP-LEDGER.md +
+氛围架构 AMBIENT.md + `shots/` 截图证据）、`scripts/`（四条自检腿 + 一次性探针 `probe-seek.mjs`）。
+
+`dsh.plugin.json` / `cordis.patch.yml` 是自装载声明：包自己往 loader 插一行 `dsh-wyymusic`，**不写 profile 的 patch 层**。
 
 ## 宿主路由
 
@@ -142,3 +144,9 @@ node scripts/harness-ambient.mjs   # 氛围编程：真内核 + 真浏览器 + �
 「网易云 API 访问层」的移植文件（`lib/netease.js` / `lib/yrc.js` / `lib/fetch-limit.js` /
 `lib/vendor/qrcode.mjs`）仍是其原始的 **MIT** 许可，出处与版权逐项列在
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)；Apache-2.0 允许收录 MIT 代码，这些文件的许可不被替换。
+
+## 交流群
+
+装不上、有 bug、想加功能 —— 欢迎来群里说（群号 **1090365627**），也欢迎直接开 [Issue](https://github.com/myYangyunfan/dsh-wyymusic/issues)。
+
+<img src="assets/qq-group.jpg" alt="【DSH】鲸小子交流群二维码，群号 1090365627" width="320">

@@ -17,7 +17,9 @@
     "NOTICE",
     "LICENSE.dsh-music-player.txt",
     "THIRD_PARTY_NOTICES.md",
-    "README.md"
+    "README.md",
+    "README.en.md",
+    "assets"
   ],
   "keywords": [
     "deepseek-harness",
