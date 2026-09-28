@@ -1,0 +1,741 @@
+{
+ "fetchedAt": "2026-09-26T13:17:53.626Z",
+ "account": "未登录",
+ "recommend": [
+  {
+   "id": "2748492595",
+   "name": "欧美万评优质女声•萦绕耳畔忆于心间",
+   "cover": "https://p2.music.126.net/ptx2Jf4PZl3oNLxv4NiADg==/109951164018765577.jpg",
+   "playCount": 40961880,
+   "creator": ""
+  },
+  {
+   "id": "6917327039",
+   "name": "前奏一响起 我瞬间释怀了",
+   "cover": "https://p2.music.126.net/b3wneqObn_0ZFajnFqwbXw==/109951171880769088.jpg",
+   "playCount": 34832312,
+   "creator": ""
+  },
+  {
+   "id": "2075587022",
+   "name": "助眠辑 | 自然音，伴灵动乐符萦绕耳畔",
+   "cover": "https://p2.music.126.net/sixunTcvD_IXeVqxZnpHkA==/109951163452086313.jpg",
+   "playCount": 30774382,
+   "creator": ""
+  },
+  {
+   "id": "6923550068",
+   "name": "0.8x哭完了吗 哭完了挂了",
+   "cover": "https://p2.music.126.net/3DMKf25Gs_86P3m3TYD7Pg==/109951169063396093.jpg",
+   "playCount": 30926166,
+   "creator": ""
+  },
+  {
+   "id": "2610231104",
+   "name": "你曾经有多认真的喜欢一个人",
+   "cover": "https://p2.music.126.net/eOTnvmGVSb3S2MIYmo2IGA==/109951163910753373.jpg",
+   "playCount": 36910024,
+   "creator": ""
+  },
+  {
+   "id": "748209731",
+   "name": "「日系」中毒|听说你也喜欢开口脆？",
+   "cover": "https://p2.music.126.net/OC42gJPuQfSETAiwMxgDAA==/109951163802641645.jpg",
+   "playCount": 21887950,
+   "creator": ""
+  },
+  {
+   "id": "8926731849",
+   "name": "打工人必备丨嘻哈律动唤醒叛逆自我",
+   "cover": "https://p2.music.126.net/rHLqXFs9FsyyXVbpgYqDiA==/109951169170442455.jpg",
+   "playCount": 24896110,
+   "creator": ""
+  },
+  {
+   "id": "129627424",
+   "name": "如果你想听民谣，可以从这些歌曲开始。",
+   "cover": "https://p2.music.126.net/KzeifdqziIovPjKqtEOdVA==/3274345632105421.jpg",
+   "playCount": 62656016,
+   "creator": ""
+  },
+  {
+   "id": "893153237",
+   "name": "粤语男声：我爱你依旧如初不曾改变",
+   "cover": "https://p2.music.126.net/Xd6h-xOoPj2yTUuQXOhyCQ==/18612532836990988.jpg",
+   "playCount": 29951572,
+   "creator": ""
+  },
+  {
+   "id": "469708961",
+   "name": "『静心纯音』钢琴的哼唱，让世界安静下来",
+   "cover": "https://p2.music.126.net/sSuUlGMAqcvszX6KC615Vg==/3420580736026170.jpg",
+   "playCount": 23862456,
+   "creator": ""
+  },
+  {
+   "id": "2312165875",
+   "name": "100首华语民谣，因为懂得才有共鸣",
+   "cover": "https://p2.music.126.net/Cl0-NpZ0ESTDjJ1HmZ33KA==/109951163460576279.jpg",
+   "playCount": 62992928,
+   "creator": ""
+  },
+  {
+   "id": "69860949",
+   "name": "『90后』小时候【所谓非主流】的经典神曲",
+   "cover": "https://p2.music.126.net/2rux5LnJey75tm9Md-9D-Q==/2890616070443534.jpg",
+   "playCount": 30580760,
+   "creator": ""
+  }
+ ],
+ "mine": [
+  {
+   "id": "8242758421",
+   "name": "yyf的网易云账号喜欢的音乐",
+   "cover": "http://p1.music.126.net/uWZzzzwXHnhqkne8ul-5TQ==/109951165991702951.jpg",
+   "playCount": 1094,
+   "creator": ""
+  },
+  {
+   "id": "17725259922",
+   "name": "BGM西域古典",
+   "cover": "http://p1.music.126.net/cOUQlqsJwRL5BF7_DOb3PA==/122045790701107.jpg",
+   "playCount": 0,
+   "creator": ""
+  },
+  {
+   "id": "17725169280",
+   "name": "BGM奇幻",
+   "cover": "http://p1.music.126.net/0KF6Zk3hbgKdVKo9C8IsuA==/109951164985330039.jpg",
+   "playCount": 0,
+   "creator": ""
+  },
+  {
+   "id": "17725144257",
+   "name": "BGM轻快",
+   "cover": "http://p1.music.126.net/tCZPuicYIQhHfJPdgfaTxw==/109951167371557477.jpg",
+   "playCount": 0,
+   "creator": ""
+  },
+  {
+   "id": "12407746246",
+   "name": "qq",
+   "cover": "http://p1.music.126.net/rFUKVdOjqxgwAT6Zi6qv7A==/109951164906689206.jpg",
+   "playCount": 2,
+   "creator": ""
+  },
+  {
+   "id": "9037423120",
+   "name": "yyf的网易云账号的2023年度歌单",
+   "cover": "http://p1.music.126.net/7utuXqpmqn8S9wO2aTdDQw==/109951164708728358.jpg",
+   "playCount": 17,
+   "creator": ""
+  },
+  {
+   "id": "8585000951",
+   "name": "Апролджэ",
+   "cover": "http://p1.music.126.net/_0O0Aw-yBMAS1fUaLqD2aw==/109951166228967540.jpg",
+   "playCount": 6,
+   "creator": ""
+  },
+  {
+   "id": "8582878430",
+   "name": "分享过",
+   "cover": "http://p1.music.126.net/-ZXfsCE1vIctcE6vIjjUXQ==/17857168347034848.jpg",
+   "playCount": 0,
+   "creator": ""
+  },
+  {
+   "id": "8540471400",
+   "name": "<俄语<",
+   "cover": "http://p1.music.126.net/OPMJ3nr0uslF4Z83TPBG_g==/109951165319800366.jpg",
+   "playCount": 26,
+   "creator": ""
+  },
+  {
+   "id": "8540100538",
+   "name": "日语？",
+   "cover": "http://p1.music.126.net/sF9I_mKMVNtsCD-ZXzfV_A==/109951165251958014.jpg",
+   "playCount": 6,
+   "creator": ""
+  }
+ ],
+ "toplists": [
+  {
+   "id": "19723756",
+   "name": "飙升榜",
+   "cover": "https://p2.music.126.net/rIi7Qzy2i2Y_1QD7cd0MYA==/109951170048506929.jpg",
+   "songs": [
+    {
+     "id": "3342319503",
+     "title": "明知故犯",
+     "artists": [
+      "Max李玄"
+     ],
+     "cover": "http://p2.music.126.net/H2DFRdwP2y5SuCAn-Tuikw==/109951172568091306.jpg",
+     "interval": 166
+    },
+    {
+     "id": "3440304347",
+     "title": "Marina",
+     "artists": [
+      "花少北"
+     ],
+     "cover": "http://p2.music.126.net/P7heir6HyXZ-KUyKDVBzVg==/109951173988276906.jpg",
+     "interval": 186
+    },
+    {
+     "id": "3372052257",
+     "title": "Kung Fu Jumpstyle",
+     "artists": [
+      "概念黁"
+     ],
+     "cover": "http://p2.music.126.net/KliaeKISrdtzwpIHWjcIuA==/109951173089315216.jpg",
+     "interval": 99
+    },
+    {
+     "id": "3440858634",
+     "title": "Patient Zero",
+     "artists": [
+      "Taylor Swift"
+     ],
+     "cover": "http://p2.music.126.net/vjZmvSow5Aq0Yeg3-9jcWg==/109951173998585253.jpg",
+     "interval": 226
+    },
+    {
+     "id": "3356975915",
+     "title": "Montagem pitty",
+     "artists": [
+      "见过夏天P",
+      "洛天依"
+     ],
+     "cover": "http://p2.music.126.net/5jl8JqT7s04C9dcoIoRH_A==/109951173083608975.jpg",
+     "interval": 98
+    },
+    {
+     "id": "3439387316",
+     "title": "G.T.R.",
+     "artists": [
+      "FiRe范艾迩",
+      "TizzyT",
+      "GALI",
+      "Capper",
+      "黄之仪Kyra Zilver"
+     ],
+     "cover": "http://p2.music.126.net/in1TteIpMgfpte7zw2Rr9w==/109951173961509176.jpg",
+     "interval": 236
+    }
+   ]
+  },
+  {
+   "id": "3779629",
+   "name": "新歌榜",
+   "cover": "https://p2.music.126.net/5guhqPBTcIrrhLBotgaT6w==/109951170048511751.jpg",
+   "songs": [
+    {
+     "id": "3425638996",
+     "title": "互删 (我走以后)",
+     "artists": [
+      "江辰"
+     ],
+     "cover": "http://p1.music.126.net/nfDVr6WopOJax11vq5brPQ==/109951173820334666.jpg",
+     "interval": 212
+    },
+    {
+     "id": "3433437362",
+     "title": "两难pt.2",
+     "artists": [
+      "加木"
+     ],
+     "cover": "http://p1.music.126.net/jr4V-LHARj4EGtLeDCLB_Q==/109951173909480514.jpg",
+     "interval": 260
+    },
+    {
+     "id": "3440858634",
+     "title": "Patient Zero",
+     "artists": [
+      "Taylor Swift"
+     ],
+     "cover": "http://p1.music.126.net/vjZmvSow5Aq0Yeg3-9jcWg==/109951173998585253.jpg",
+     "interval": 226
+    },
+    {
+     "id": "3431639713",
+     "title": "冷刺（他们说爱上一个人需要等待）",
+     "artists": [
+      "Start Over"
+     ],
+     "cover": "http://p1.music.126.net/yUKX1d_nqKDX-F5pxGK5Aw==/109951173886889373.jpg",
+     "interval": 178
+    },
+    {
+     "id": "3434747816",
+     "title": "牵我的手好吗",
+     "artists": [
+      "吴琳珂Moske"
+     ],
+     "cover": "http://p1.music.126.net/nmaLZTVSB92Ggqhl9zhB6g==/109951173919639815.jpg",
+     "interval": 243
+    },
+    {
+     "id": "3440304347",
+     "title": "Marina",
+     "artists": [
+      "花少北"
+     ],
+     "cover": "http://p1.music.126.net/P7heir6HyXZ-KUyKDVBzVg==/109951173988276906.jpg",
+     "interval": 186
+    }
+   ]
+  },
+  {
+   "id": "2884035",
+   "name": "原创榜",
+   "cover": "https://p2.music.126.net/BaP9nrocNTL3gGThysv4eQ==/109951170091896587.jpg",
+   "songs": [
+    {
+     "id": "3436809273",
+     "title": "今非昔比",
+     "artists": [
+      "张方钊"
+     ],
+     "cover": "http://p2.music.126.net/zHRzldNmi5I8_2O9m1wBPw==/109951173951926165.jpg",
+     "interval": 224
+    },
+    {
+     "id": "3437225352",
+     "title": "两个月亮",
+     "artists": [
+      "酷酷的蓝",
+      "魅",
+      "造梦师DreamMaker"
+     ],
+     "cover": "http://p1.music.126.net/G_4Egd4tRTNX0VcQbqQE4g==/109951173950851573.jpg",
+     "interval": 187
+    },
+    {
+     "id": "3439330881",
+     "title": "我想一个人呆一呆",
+     "artists": [
+      "XMASwu(吴骜)"
+     ],
+     "cover": "http://p1.music.126.net/yrv_LjyZRLGsoRLg1dRgog==/109951173976585550.jpg",
+     "interval": 160
+    },
+    {
+     "id": "3438968283",
+     "title": "花骨朵",
+     "artists": [
+      "洛天依Official",
+      "亞細亞曠世奇才"
+     ],
+     "cover": "http://p1.music.126.net/_nQm6G_r2169K752DvbwoA==/109951173972266080.jpg",
+     "interval": 167
+    },
+    {
+     "id": "3436897178",
+     "title": "风",
+     "artists": [
+      "张泽历"
+     ],
+     "cover": "http://p1.music.126.net/odJKKelVa7aKP_W9ZTtW3g==/109951173947197707.jpg",
+     "interval": 268
+    },
+    {
+     "id": "3437686063",
+     "title": "烂情歌",
+     "artists": [
+      "暴躁的兔子"
+     ],
+     "cover": "http://p2.music.126.net/HndJPm7N4iT2k1YBm5yvwA==/109951173955954816.jpg",
+     "interval": 200
+    }
+   ]
+  },
+  {
+   "id": "3778678",
+   "name": "热歌榜",
+   "cover": "https://p2.music.126.net/0SUEG8yDACfx0Bw2MYFv4Q==/109951170048519512.jpg",
+   "songs": []
+  },
+  {
+   "id": "71384707",
+   "name": "网易云古典榜",
+   "cover": "https://p2.music.126.net/urByD_AmfBDBrs7fA9-O8A==/109951167976973225.jpg",
+   "songs": []
+  },
+  {
+   "id": "1978921795",
+   "name": "网易云电音榜",
+   "cover": "https://p2.music.126.net/hXGObvXfsGtFjFvRhOYAkA==/109951170091888741.jpg",
+   "songs": []
+  },
+  {
+   "id": "991319590",
+   "name": "网易云中文说唱榜",
+   "cover": "https://p2.music.126.net/GgHbgDfGXHpE2YTchU7IvA==/109951171510498108.jpg",
+   "songs": []
+  },
+  {
+   "id": "18176153161",
+   "name": "实时分享榜",
+   "cover": "https://p2.music.126.net/b2-_Xw-6DwDXWIn7RNuCYQ==/109951173652479140.jpg",
+   "songs": []
+  }
+ ],
+ "details": {
+  "2075587022": {
+   "name": "助眠辑 | 自然音，伴灵动乐符萦绕耳畔",
+   "cover": "https://p1.music.126.net/sixunTcvD_IXeVqxZnpHkA==/109951163452086313.jpg",
+   "trackCount": 104,
+   "playCount": 30774382,
+   "description": "歌单收录以自然声效为背景的纯音乐，海浪、雨水、溪流、虫鸣、鸟叫、车辆川流......带上耳机，愿能此声能将室外噪音减到最低，给你心如止水的平静，体验一场心灵Spa，携这份安稳沉沉入睡。\n\n歌曲分布：\n01-16 雷雨声背景纯音乐\n17-28 蝉鸣背景纯音乐\n29-65 海水、溪流背景纯音乐\n66-90 鸟鸣与溪水背景纯",
+   "songs": [
+    {
+     "id": "5308068",
+     "title": "비오는 소리 (Intro)",
+     "artists": [
+      "July"
+     ],
+     "album": "To Heaven",
+     "interval": 88,
+     "cover": "http://p1.music.126.net/-IupsemNeYif1796jkN4MA==/573945069705658.jpg"
+    },
+    {
+     "id": "35032655",
+     "title": "「3D雷雨助眠」Good Night Lullaby",
+     "artists": [
+      "ChenDjoy"
+     ],
+     "album": "「3D奇妙听觉」自然声与轻音乐的融合",
+     "interval": 119,
+     "cover": "http://p1.music.126.net/YBikSLBNAWZ-z_UClWWPyQ==/18448705602489632.jpg"
+    },
+    {
+     "id": "33933040",
+     "title": "여름비 (7月)",
+     "artists": [
+      "The Film"
+     ],
+     "album": "3집 Season 2 `여름`",
+     "interval": 63,
+     "cover": "http://p1.music.126.net/baCMw_b3IU8GMpo32r3TSg==/3280942697537551.jpg"
+    },
+    {
+     "id": "5330912",
+     "title": "I Need You (Rain Day)",
+     "artists": [
+      "단비"
+     ],
+     "album": "Jealousy",
+     "interval": 178,
+     "cover": "http://p1.music.126.net/gPnzpg4-jtPEtrI8LLrc9g==/109951170103239601.jpg"
+    },
+    {
+     "id": "550144",
+     "title": "Rainy Mood",
+     "artists": [
+      "5mg"
+     ],
+     "album": "See You in My Dream",
+     "interval": 204,
+     "cover": "http://p2.music.126.net/cQ4oM3iTFNIpIkxW89HteQ==/109951163093545902.jpg"
+    },
+    {
+     "id": "603899",
+     "title": "雨",
+     "artists": [
+      "KAO"
+     ],
+     "album": "POLKA DOTS CANDY",
+     "interval": 180,
+     "cover": "http://p1.music.126.net/ar-Y1_-afssistZHyfTACA==/109951173664399213.jpg"
+    },
+    {
+     "id": "29137872",
+     "title": "ζ",
+     "artists": [
+      "α·Pav"
+     ],
+     "album": "Pavonis ~ Piano Collection II ~",
+     "interval": 187,
+     "cover": "http://p1.music.126.net/U5O4aGdTvcnHSA5HhxLapg==/7937374441937799.jpg"
+    },
+    {
+     "id": "29713218",
+     "title": "rain",
+     "artists": [
+      "ねこぼーろ"
+     ],
+     "album": "Dot.",
+     "interval": 155,
+     "cover": "http://p2.music.126.net/XQ0apoeD66MvCdhpcBtByg==/3239161255748471.jpg"
+    }
+   ]
+  },
+  "2748492595": {
+   "name": "欧美万评优质女声•萦绕耳畔忆于心间",
+   "cover": "https://p1.music.126.net/ptx2Jf4PZl3oNLxv4NiADg==/109951164018765577.jpg",
+   "trackCount": 168,
+   "playCount": 40961880,
+   "description": "Duang~~\n\n第二单欧美万评女声来啦~~~\n\n此单和之前的欧美万评男声类似，收录1w+欧美女声，优质的欧美女声不得不你让为她单曲循环，在此精挑细选了很多首欧美女声，都是非常耐听的优质歌曲，也有大家可能比较熟悉的歌曲，借此在回味回味，还是会一直不间断的更新的。此单电音女声歌曲也有不少，加入的原因是自我感觉电音和女声非",
+   "songs": [
+    {
+     "id": "1347227968",
+     "title": "Bloom",
+     "artists": [
+      "Dabin",
+      "Dia Frampton"
+     ],
+     "album": "Wild Youth",
+     "interval": 240,
+     "cover": "http://p1.music.126.net/9ABIVDpwv0O8YpnsSBi2qA==/109951168785996138.jpg"
+    },
+    {
+     "id": "39224884",
+     "title": "Cheap Thrills",
+     "artists": [
+      "Sia"
+     ],
+     "album": "This Is Acting",
+     "interval": 212,
+     "cover": "http://p1.music.126.net/zmDE8IMf0QKDLVQc1xh4RA==/109951165973312283.jpg"
+    },
+    {
+     "id": "1374329431",
+     "title": "Dancing With Your Ghost",
+     "artists": [
+      "Sasha Alex Sloan"
+     ],
+     "album": "Dancing With Your Ghost",
+     "interval": 198,
+     "cover": "http://p1.music.126.net/T2vjSPaRZxFGIC2HOXElkQ==/109951165986777646.jpg"
+    },
+    {
+     "id": "1364343491",
+     "title": "Dance Monkey",
+     "artists": [
+      "Tones and I"
+     ],
+     "album": "Dance Monkey",
+     "interval": 209,
+     "cover": "http://p1.music.126.net/w0pfCZcEqVpu3Bs9UqS1Qw==/109951173497110270.jpg"
+    },
+    {
+     "id": "457552211",
+     "title": "Dark Side",
+     "artists": [
+      "Phoebe Ryan"
+     ],
+     "album": "Dark Side",
+     "interval": 205,
+     "cover": "http://p1.music.126.net/wpVab7o40vlZb4eEfPMVwQ==/109951165976777682.jpg"
+    },
+    {
+     "id": "1355147933",
+     "title": "bad guy",
+     "artists": [
+      "Billie Eilish"
+     ],
+     "album": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
+     "interval": 194,
+     "cover": "http://p1.music.126.net/ehx5edsHvWsiaTxm9LVgQw==/109951169009496980.jpg"
+    },
+    {
+     "id": "418603177",
+     "title": "Six Feet Under",
+     "artists": [
+      "Billie Eilish"
+     ],
+     "album": "Six Feet Under",
+     "interval": 192,
+     "cover": "http://p1.music.126.net/ijP5nfST3YxxzJ2mXTEbag==/1393081244481550.jpg"
+    },
+    {
+     "id": "410654865",
+     "title": "GQ",
+     "artists": [
+      "Lola Coca"
+     ],
+     "album": "GQ",
+     "interval": 163,
+     "cover": "http://p1.music.126.net/dMWLKIfPcX5xOkRPtts4iw==/109951163291357023.jpg"
+    }
+   ]
+  },
+  "6917327039": {
+   "name": "前奏一响起 我瞬间释怀了",
+   "cover": "https://p1.music.126.net/b3wneqObn_0ZFajnFqwbXw==/109951171880769088.jpg",
+   "trackCount": 195,
+   "playCount": 34832312,
+   "description": "世间都是这样的，不管走到哪里，总有令人失望的事情，一旦碰到，我们就很容易过度悲观，把事情看得太严重。放心，闭上眼，睡一觉，说不定明天就会有新鲜的事儿发生",
+   "songs": [
+    {
+     "id": "2108845007",
+     "title": "讴歌",
+     "artists": [
+      "Vansdaddy"
+     ],
+     "album": "讴歌",
+     "interval": 136,
+     "cover": "http://p1.music.126.net/xfPdDoM-Kk14BFdJT7Qxgw==/109951169164991342.jpg"
+    },
+    {
+     "id": "3428915416",
+     "title": "树影",
+     "artists": [
+      "KIND"
+     ],
+     "album": "树影",
+     "interval": 162,
+     "cover": "http://p1.music.126.net/mYkWTgkrKXIPBncKpG9N6Q==/109951173803540810.jpg"
+    },
+    {
+     "id": "3388509025",
+     "title": "12.31",
+     "artists": [
+      "郑润泽"
+     ],
+     "album": "12.31",
+     "interval": 254,
+     "cover": "http://p1.music.126.net/yXVhyEsDocNo9YUapxwaVA==/109951173311841082.jpg"
+    },
+    {
+     "id": "2748584629",
+     "title": "期限",
+     "artists": [
+      "KIND"
+     ],
+     "album": "期限",
+     "interval": 171,
+     "cover": "http://p1.music.126.net/eOwUvvPSpB2Ao7wIZBCbQw==/109951172049753768.jpg"
+    },
+    {
+     "id": "3399839173",
+     "title": "甲乙丙丁 (你我怎么两清)",
+     "artists": [
+      "李佳薇"
+     ],
+     "album": "甲乙丙丁",
+     "interval": 210,
+     "cover": "http://p1.music.126.net/H9iDvukTit_jx-fmhhvXUQ==/109951173482378749.jpg"
+    },
+    {
+     "id": "3382908505",
+     "title": "玻璃",
+     "artists": [
+      "Gareth.T"
+     ],
+     "album": "玻璃",
+     "interval": 185,
+     "cover": "http://p1.music.126.net/MSKoQP60up7v3y1P1d3JIQ==/109951173234747322.jpg"
+    },
+    {
+     "id": "1945316194",
+     "title": "END",
+     "artists": [
+      "KIND",
+      "尔灿"
+     ],
+     "album": "END",
+     "interval": 157,
+     "cover": "http://p1.music.126.net/7gbQXdUzojBTHTuEUt8LYQ==/109951167386819598.jpg"
+    },
+    {
+     "id": "287398",
+     "title": "我不难过",
+     "artists": [
+      "孙燕姿"
+     ],
+     "album": "未完成",
+     "interval": 320,
+     "cover": "http://p1.music.126.net/Pzxy6py26NgNmhJjYMf2RQ==/109951169724216323.jpg"
+    }
+   ]
+  }
+ },
+ "lyric": {
+  "song": {
+   "id": "1347227968",
+   "title": "Bloom",
+   "artists": [
+    "Dabin",
+    "Dia Frampton"
+   ],
+   "album": "Wild Youth",
+   "cover": "http://p1.music.126.net/9ABIVDpwv0O8YpnsSBi2qA==/109951168785996138.jpg",
+   "interval": 240
+  },
+  "count": 43,
+  "chars": [
+   32,
+   29,
+   30,
+   27,
+   30,
+   34,
+   53,
+   52,
+   30,
+   27,
+   49,
+   20,
+   30,
+   17,
+   17,
+   17,
+   17,
+   29,
+   32,
+   28,
+   31,
+   53,
+   52,
+   30,
+   28,
+   49,
+   20,
+   30,
+   49,
+   20,
+   30,
+   17
+  ],
+  "times": [
+   0,
+   0,
+   3.8,
+   7.4,
+   11.1,
+   13.6,
+   17.3,
+   23.5,
+   30.7,
+   38,
+   45.1,
+   49.6,
+   52.3,
+   59.4,
+   66.5,
+   73.7,
+   80.8,
+   89.7,
+   93.2,
+   96.8,
+   99.4,
+   103.4,
+   109.5,
+   116.7,
+   123.9,
+   131.1,
+   135.5,
+   138.2,
+   159.8,
+   164.2,
+   166.8,
+   174.1
+  ],
+  "hasTrans": true,
+  "hasRoma": false,
+  "wordLevel": true
+ }
+}

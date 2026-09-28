@@ -1,0 +1,16 @@
+# 依赖与安装产物
+node_modules/
+
+# 打包产物（npm pack / 发布包）
+*.tgz
+
+# 日志与临时物
+*.log
+npm-debug.log*
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

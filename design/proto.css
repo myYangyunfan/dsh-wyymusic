@@ -1,0 +1,394 @@
+/* ==========================================================================
+   dsh-wyymusic 视觉方案原型 —— 设计令牌 + 组件
+   前缀 .wyy- 与 lib/client.js 一致，评审通过后可机械迁移。
+   ========================================================================== */
+
+/* ---------- 0. 重置（:where() 把特异性压到 0，避免 .wyy-page button 盖掉单类规则） ---------- */
+:where(.wyy-page, .wyy-shell) * { box-sizing: border-box }
+:where(.wyy-page, .wyy-shell) :where(button) { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent }
+:where(.wyy-page, .wyy-shell) :where(input) { font: inherit; color: inherit; background: none; border: none; outline: none }
+:where(.wyy-page, .wyy-shell) :where(img) { display: block; max-width: 100% }
+:where(.wyy-page, .wyy-shell) :where(ul, ol) { list-style: none; margin: 0; padding: 0 }
+:where(.wyy-page, .wyy-shell) :where(p, h1, h2, h3, h4) { margin: 0 }
+
+/* ---------- 1. L1 品牌 + L2 表面：浅色（网易云基底） ---------- */
+.wyy-page {
+  /* 品牌色：只在交互控件与「正在播放」指示上出现 */
+  --wyy-brand: #ec4141;
+  --wyy-brand-hover: #d73535;
+  --wyy-brand-soft: rgba(236, 65, 65, .08);
+
+  /* L2 表面阶梯：浅色用极浅灰阶分层，阴影不参与层级 */
+  --wyy-bg: #ffffff;
+  --wyy-bg-rail: #f6f6f7;
+  --wyy-surface-1: #f7f7f8;
+  --wyy-surface-2: #efeff0;
+  --wyy-surface-hover: #ebebec;
+  --wyy-surface-press: #e2e2e4;
+
+  /* 文字阶梯：#181818 起，避免纯黑的刺眼 */
+  --wyy-fg: #181818;
+  --wyy-fg-2: #5f5f66;
+  --wyy-fg-3: #86868e;
+  --wyy-border: rgba(18, 18, 20, .08);
+  --wyy-track: #dcdcdf;
+  --wyy-ly-off: #b9b9bf;
+  --wyy-ly-on: #181818;
+
+  /* 玻璃遮罩（封面浮层上的按钮） */
+  --wyy-veil: rgba(255, 255, 255, .72);
+  --wyy-veil-hover: rgba(255, 255, 255, .88);
+  /* 播放条：浅色用极淡艺术染色（用 deep 会发脏） */
+  --wyy-bar-bg: color-mix(in oklab, var(--art-tint) 72%, var(--wyy-bg));
+  /* 全屏歌词：浅色是「亮色染色 + 白」，深色是「暗色染色 + 黑」 */
+  --np-top: color-mix(in oklab, var(--art-band) 66%, #ffffff);
+  --np-wash-a: color-mix(in oklab, var(--art-vivid) 46%, transparent);
+  --np-wash-b: color-mix(in oklab, var(--art-wash) 58%, transparent);
+
+  /* L3 艺术色：未取到时的兜底 = 品牌红的极淡染色 */
+  --art-band: #f6d6d6;
+  --art-vivid: #f6d6d6;
+  --art-deep: #efe2e2;
+  --art-wash: #f7eaea;
+  --art-tint: #f7f4f4;
+  --art-highlight: #d9a5a5;
+  --art-on: #181818;
+}
+
+/* ---------- 2. L2 表面：深色（Spotify Encore 实测灰阶） ---------- */
+body[data-ds-dark-theme] .wyy-page,
+.wyy-shell[data-theme='dark'] .wyy-page {
+  --wyy-brand: #ec4141;          /* 深色下红色只留给播放键与选中态 */
+  --wyy-brand-hover: #ff4f4f;
+  --wyy-brand-soft: rgba(236, 65, 65, .16);
+
+  --wyy-bg: #121212;             /* Encore: bg-base */
+  --wyy-bg-rail: #000000;        /* Encore: app frame base */
+  --wyy-surface-1: #181818;
+  --wyy-surface-2: #1f1f1f;      /* Encore: hover / elevated-base —— 不是 #282828 */
+  --wyy-surface-hover: #232323;
+  --wyy-surface-press: #2a2a2a;  /* Encore: elevated-highlight */
+
+  --wyy-fg: #f5f5f5;             /* 不用 #fff：18.7:1 会在黑底上产生光晕 */
+  --wyy-fg-2: #b3b3b3;           /* Encore: subdued */
+  --wyy-fg-3: #8c8c90;
+  --wyy-border: rgba(255, 255, 255, .09);
+  --wyy-track: #4d4d4d;
+  --wyy-ly-off: #5a5a5e;
+  --wyy-ly-on: #f5f5f5;
+
+  --wyy-veil: rgba(0, 0, 0, .54);   /* Encore: controls over artwork */
+  --wyy-veil-hover: rgba(0, 0, 0, .68);
+  --wyy-bar-bg: color-mix(in oklab, var(--art-deep) 30%, var(--wyy-bg));
+  --np-top: color-mix(in oklab, var(--art-deep) 92%, #000000);
+  --np-wash-a: color-mix(in oklab, var(--art-vivid) 80%, transparent);
+  --np-wash-b: color-mix(in oklab, var(--art-wash) 70%, transparent);
+
+  --art-band: #2a2a2e;
+  --art-vivid: #2a2a2e;
+  --art-deep: #17171a;
+  --art-wash: #201f26;
+  --art-tint: #161618;
+  --art-highlight: #7f7f84;
+  --art-on: #f5f5f5;
+}
+
+/* ---------- 3. 排印系统（深色/浅色共用；中文友好） ---------- */
+.wyy-page, .wyy-page * {
+  font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC",
+               system-ui, -apple-system, sans-serif;
+}
+.wyy-page {
+  /* 字号/行高刻度：最小 12px（Fluent 可读下限），行高中文取 1.45–1.7 */
+  --fs-meta: 12px;   --lh-meta: 16px;
+  --fs-sm: 13px;     --lh-sm: 20px;
+  --fs-body: 14px;   --lh-body: 22px;
+  --fs-sub: 16px;    --lh-sub: 24px;
+  --fs-card: 17px;   --lh-card: 24px;
+  --fs-sec: 20px;    --lh-sec: 28px;
+  --fs-title: 26px;  --lh-title: 34px;
+  --fs-head: 34px;   --lh-head: 42px;
+  --fs-lyr: clamp(24px, 3.4vw, 38px);
+
+  /* 中文一律不做负字距（观感发挤）；只有全大写拉丁标签加正字距 */
+  --ls-eyebrow: .08em;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--wyy-fg);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 4. 间距 / 圆角 / 动效刻度 ---------- */
+.wyy-page {
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-pill: 999px;
+  --t-fast: 100ms; --t: 200ms; --t-slow: 320ms;
+  --ease: cubic-bezier(.3, 0, 0, 1);
+  --row-h: 44px;
+  --bar-h: 84px;
+}
+
+/* ---------- 5. 骨架 ---------- */
+.wyy-shell { display: flex; height: 100vh; background: var(--wyy-bg-rail); overflow: hidden }
+.wyy-rail {
+  width: 232px; flex: none; display: flex; flex-direction: column; gap: var(--s-2);
+  padding: var(--s-4) var(--s-2) var(--s-3); background: var(--wyy-bg-rail);
+  border-right: 1px solid var(--wyy-border);
+}
+.wyy-brandline { display: flex; align-items: center; gap: var(--s-2); padding: 0 var(--s-2) var(--s-3) }
+.wyy-brandline .dot { width: 26px; height: 26px; border-radius: var(--r-sm); background: var(--wyy-brand); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px }
+.wyy-brandline b { font-size: var(--fs-sub); font-weight: 700; letter-spacing: .2px }
+.wyy-nav { display: flex; flex-direction: column; gap: 2px }
+.wyy-nav button {
+  display: flex; align-items: center; gap: var(--s-3); height: 40px; padding: 0 var(--s-3);
+  border-radius: var(--r-sm); color: var(--wyy-fg-2); font-size: var(--fs-body); font-weight: 500;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.wyy-nav button:hover { color: var(--wyy-fg); background: var(--wyy-surface-2) }
+.wyy-nav button[aria-current='true'] { color: var(--wyy-fg); background: var(--wyy-surface-2); font-weight: 700 }
+.wyy-nav button[aria-current='true'] .bar { opacity: 1 }
+.wyy-nav .bar { width: 3px; height: 18px; border-radius: var(--r-pill); background: var(--wyy-brand); margin-right: -6px; opacity: 0; transition: opacity var(--t-fast) }
+.wyy-lib { margin-top: var(--s-3); padding: var(--s-3) var(--s-3) 0; border-top: 1px solid var(--wyy-border); overflow: auto }
+.wyy-lib .eyebrow { padding: 0 var(--s-2) var(--s-2) }
+.wyy-lib button { display: flex; gap: var(--s-3); align-items: center; padding: var(--s-2); border-radius: var(--r-xs); color: var(--wyy-fg-2); font-size: var(--fs-sm); text-align: left }
+.wyy-lib button:hover { background: var(--wyy-surface-2); color: var(--wyy-fg) }
+.wyy-lib img { width: 40px; height: 40px; border-radius: var(--r-xs); object-fit: cover; flex: none }
+.wyy-lib .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+
+.eyebrow {
+  font-size: var(--fs-meta); line-height: var(--lh-meta); font-weight: 700;
+  letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--wyy-fg-3);
+}
+
+.wyy-main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--wyy-bg); border-radius: var(--r-lg); margin: var(--s-2) var(--s-2) var(--s-2) 0; overflow: hidden; position: relative }
+.wyy-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin }
+.wyy-scroll::-webkit-scrollbar { width: 12px }
+.wyy-scroll::-webkit-scrollbar-thumb { background: var(--wyy-track); border: 3px solid transparent; background-clip: content-box; border-radius: var(--r-pill) }
+
+/* ---------- 6. L3 艺术色横幅：本方案的核心 ---------- */
+.wyy-band {
+  position: relative; padding: var(--s-8) var(--s-8) var(--s-6);
+  background:
+    radial-gradient(120% 90% at 14% -30%, color-mix(in oklab, var(--art-vivid) 66%, transparent) 0%, transparent 64%),
+    linear-gradient(180deg,
+      var(--art-band) 0%,
+      color-mix(in oklab, var(--art-band) 68%, var(--wyy-bg)) 40%,
+      color-mix(in oklab, var(--art-band) 28%, var(--wyy-bg)) 72%,
+      var(--wyy-bg) 100%);
+  transition: background var(--t-slow) var(--ease);
+}
+.wyy-band::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, var(--wyy-bg)); pointer-events: none }
+.wyy-band > * { position: relative; z-index: 1 }
+.wyy-band-head { display: flex; align-items: flex-end; gap: var(--s-6); flex-wrap: wrap }
+.wyy-band-art {
+  width: 168px; height: 168px; border-radius: var(--r-md); object-fit: cover; flex: none;
+  box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--art-deep) 70%, transparent);
+}
+.wyy-band-txt { min-width: 0; flex: 1 }
+.wyy-band .eyebrow { color: color-mix(in oklab, var(--art-on) 72%, transparent); margin-bottom: var(--s-2) }
+.wyy-band h1 {
+  font-size: var(--fs-head); line-height: var(--lh-head); font-weight: 800; letter-spacing: 0;
+  color: var(--art-on); text-wrap: balance;
+}
+.wyy-band .sub { margin-top: var(--s-3); color: color-mix(in oklab, var(--art-on) 78%, transparent); font-size: var(--fs-sm); line-height: var(--lh-sm); max-width: 66ch; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden }
+.wyy-band-meta { display: flex; align-items: center; gap: var(--s-3); margin-top: var(--s-3); font-size: var(--fs-sm); color: color-mix(in oklab, var(--art-on) 82%, transparent) }
+.wyy-band-meta .sep { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .6 }
+.wyy-band-tools { display: flex; align-items: center; gap: var(--s-5); padding-top: var(--s-2) }
+
+/* ---------- 7. 控件 ---------- */
+.wyy-round {
+  width: 48px; height: 48px; border-radius: var(--r-pill); background: var(--wyy-brand); color: #fff;
+  display: grid; place-items: center; flex: none;
+  transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease), box-shadow var(--t) var(--ease);
+  box-shadow: 0 8px 22px -8px color-mix(in oklab, var(--wyy-brand) 70%, transparent);
+}
+.wyy-round:hover { background: var(--wyy-brand-hover); transform: scale(1.04) }
+.wyy-round:active { transform: scale(.97) }
+.wyy-round.lg { width: 56px; height: 56px }
+.wyy-round.on-band { background: color-mix(in oklab, var(--art-on) 92%, transparent); color: var(--art-vivid); box-shadow: 0 8px 24px -10px rgba(0, 0, 0, .5) }
+.wyy-ghost {
+  height: 36px; padding: 0 var(--s-4); border-radius: var(--r-pill); border: 1px solid var(--wyy-border);
+  color: var(--wyy-fg-2); font-size: var(--fs-sm); font-weight: 600; background: transparent;
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.wyy-ghost:hover { color: var(--wyy-fg); border-color: currentColor }
+.wyy-ghost.on { background: var(--wyy-surface-2); border-color: transparent; color: var(--wyy-fg) }
+.wyy-icon {
+  width: 36px; height: 36px; border-radius: var(--r-pill); color: var(--wyy-fg-2);
+  display: grid; place-items: center; transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.wyy-icon:hover { color: var(--wyy-fg); background: var(--wyy-surface-2) }
+.wyy-icon.liked { color: var(--wyy-brand) }
+.wyy-fab {
+  width: 44px; height: 44px; border-radius: var(--r-pill); background: var(--wyy-veil); color: var(--wyy-fg);
+  display: grid; place-items: center; opacity: 0; transform: translateY(6px);
+  transition: opacity var(--t) var(--ease), transform var(--t) var(--ease), background var(--t-fast) var(--ease);
+}
+.wyy-fab:hover { background: var(--wyy-veil-hover); transform: translateY(0) scale(1.06) }
+
+/* ---------- 8. 区块 + 卡片网格 ---------- */
+.wyy-body { padding: 0 var(--s-8) var(--s-8) }
+.wyy-sec { margin-top: var(--s-10) }
+.wyy-sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-5) }
+.wyy-sec-head h2 { font-size: var(--fs-sec); line-height: var(--lh-sec); font-weight: 700; letter-spacing: 0 }
+.wyy-sec-head a { font-size: var(--fs-meta); font-weight: 700; letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--wyy-fg-3); cursor: pointer }
+.wyy-sec-head a:hover { color: var(--wyy-fg) }
+
+.wyy-grid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) }
+.wyy-card {
+  padding: var(--s-4); border-radius: var(--r-md); background: var(--wyy-surface-1); position: relative;
+  transition: background var(--t) var(--ease);
+}
+.wyy-card:hover { background: var(--wyy-surface-hover) }
+.wyy-card .cover-wrap { position: relative; margin-bottom: var(--s-3) }
+.wyy-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-sm); box-shadow: 0 10px 26px -14px rgba(0, 0, 0, .45) }
+.wyy-card .wyy-fab { position: absolute; right: var(--s-2); bottom: var(--s-2) }
+.wyy-card:hover .wyy-fab, .wyy-card:focus-within .wyy-fab { opacity: 1; transform: translateY(0) }
+.wyy-card .name { font-size: var(--fs-card); line-height: var(--lh-card); font-weight: 600; color: var(--wyy-fg); display: -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+.wyy-card .desc { margin-top: var(--s-1); font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--wyy-fg-3); display: -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+.wyy-card.playing { background: color-mix(in oklab, var(--art-vivid) 16%, var(--wyy-surface-1)) }
+.wyy-card.playing .name { color: var(--wyy-brand) }
+
+/* 横向快选（分类/场景） */
+.wyy-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(148px, 1fr); gap: var(--s-3); overflow-x: auto; padding-bottom: var(--s-2) }
+.wyy-tile { position: relative; height: 96px; border-radius: var(--r-md); overflow: hidden; padding: var(--s-3); font-weight: 700; font-size: var(--fs-sub); color: var(--art-on); background: linear-gradient(135deg, var(--art-vivid), var(--art-deep)); transition: transform var(--t) var(--ease), filter var(--t) var(--ease) }
+.wyy-tile:hover { transform: translateY(-2px); filter: saturate(1.12) brightness(1.06) }
+.wyy-tile img { position: absolute; right: -12px; bottom: -10px; width: 76px; height: 76px; border-radius: var(--r-sm); transform: rotate(22deg); opacity: .9; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .5) }
+
+/* ---------- 9. 曲目列表 ---------- */
+.wyy-rows { display: flex; flex-direction: column; gap: 2px }
+.wyy-row {
+  display: grid; grid-template-columns: 32px minmax(0, 3fr) minmax(0, 2fr) 64px 44px;
+  align-items: center; gap: var(--s-4); height: var(--row-h); padding: 0 var(--s-3);
+  border-radius: var(--r-xs); color: var(--wyy-fg-2); font-size: var(--fs-body);
+  transition: background var(--t-fast) var(--ease);
+}
+.wyy-row:hover { background: var(--wyy-surface-2) }
+.wyy-row .idx { font-variant-numeric: tabular-nums; font-size: var(--fs-sm); color: var(--wyy-fg-3); text-align: right; padding-right: var(--s-2) }
+.wyy-row:hover .idx .n { display: none }
+.wyy-row .idx .p { display: none }
+.wyy-row:hover .idx .p { display: block; color: var(--wyy-fg) }
+.wyy-row .tt { display: flex; align-items: center; gap: var(--s-3); min-width: 0 }
+.wyy-row .tt img { width: 36px; height: 36px; border-radius: var(--r-xs); object-fit: cover; flex: none }
+.wyy-row .tn { min-width: 0 }
+.wyy-row .t1 { color: var(--wyy-fg); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.wyy-row .t2 { font-size: var(--fs-sm); color: var(--wyy-fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.wyy-row .al { font-size: var(--fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.wyy-row .al:hover { text-decoration: underline }
+.wyy-row .du { font-variant-numeric: tabular-nums; font-size: var(--fs-sm); text-align: right; color: var(--wyy-fg-3) }
+.wyy-row.on { background: color-mix(in oklab, var(--art-vivid) 14%, transparent) }
+.wyy-row.on .t1 { color: var(--wyy-brand); font-weight: 700 }
+.wyy-row.on .idx { color: var(--wyy-brand) }
+.wyy-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; width: 12px; flex: none }
+.wyy-eq i { width: 2px; background: var(--wyy-brand); border-radius: 1px; animation: wyy-eq 1s var(--ease) infinite }
+.wyy-eq i:nth-child(2) { animation-delay: .18s } .wyy-eq i:nth-child(3) { animation-delay: .38s }
+@keyframes wyy-eq { 0%, 100% { height: 30% } 50% { height: 100% } }
+
+/* ---------- 10. 顶部工具条 / 搜索 chips ---------- */
+.wyy-topbar {
+  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: var(--s-4);
+  height: 64px; padding: 0 var(--s-8);
+  background: color-mix(in oklab, var(--wyy-bg) 72%, transparent); backdrop-filter: blur(14px) saturate(140%);
+}
+.wyy-topbar .sp { flex: 1 }
+.wyy-searchbox {
+  display: flex; align-items: center; gap: var(--s-2); height: 40px; width: 320px; padding: 0 var(--s-4);
+  border-radius: var(--r-pill); background: var(--wyy-surface-2); color: var(--wyy-fg-3);
+}
+.wyy-searchbox input { flex: 1; min-width: 0; color: var(--wyy-fg); font-size: var(--fs-body) }
+.wyy-searchbox:focus-within { outline: 2px solid var(--wyy-brand); outline-offset: -2px }
+.wyy-chips { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-4) }
+.wyy-chip {
+  height: 32px; padding: 0 var(--s-4); border-radius: var(--r-pill); font-size: var(--fs-sm); font-weight: 600;
+  background: var(--wyy-surface-2); color: var(--wyy-fg-2); transition: all var(--t-fast) var(--ease);
+}
+.wyy-chip:hover { color: var(--wyy-fg); background: var(--wyy-surface-press) }
+.wyy-chip[aria-selected='true'] { background: var(--wyy-brand); color: #fff }
+
+/* ---------- 11. 播放条 ---------- */
+.wyy-bar {
+  height: var(--bar-h); flex: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  align-items: center; gap: var(--s-6); padding: 0 var(--s-5);
+  background: var(--wyy-bar-bg);
+  border-top: 1px solid var(--wyy-border);
+  transition: background var(--t-slow) var(--ease);
+}
+.wyy-bar .now { display: flex; align-items: center; gap: var(--s-3); min-width: 0 }
+.wyy-bar .now img { width: 56px; height: 56px; border-radius: var(--r-xs); object-fit: cover }
+.wyy-bar .now .t1 { font-size: var(--fs-body); font-weight: 600; color: var(--wyy-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.wyy-bar .now .t2 { font-size: var(--fs-sm); color: var(--wyy-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.wyy-bar .mid { display: flex; flex-direction: column; gap: var(--s-2) }
+.wyy-bar .ctl { display: flex; align-items: center; justify-content: center; gap: var(--s-5) }
+.wyy-bar .play { width: 38px; height: 38px; border-radius: var(--r-pill); background: var(--wyy-fg); color: var(--wyy-bg); display: grid; place-items: center; transition: transform var(--t-fast) var(--ease) }
+.wyy-bar .play:hover { transform: scale(1.06) }
+.wyy-prog { display: flex; align-items: center; gap: var(--s-3); font-variant-numeric: tabular-nums; font-size: var(--fs-meta); color: var(--wyy-fg-3) }
+.wyy-track { position: relative; flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--wyy-track); cursor: pointer }
+.wyy-fill { position: absolute; inset: 0 auto 0 0; border-radius: var(--r-pill); background: var(--wyy-fg); transition: background var(--t-fast) }
+.wyy-track:hover .wyy-fill { background: var(--wyy-brand) }
+.wyy-knob { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .4); opacity: 0; transition: opacity var(--t-fast) }
+.wyy-track:hover .wyy-knob { opacity: 1 }
+.wyy-bar .right { display: flex; align-items: center; gap: var(--s-3); justify-content: flex-end }
+
+/* ---------- 12. 全屏歌词（Spotify full-screen now playing） ---------- */
+.wyy-np {
+  position: absolute; inset: 0; z-index: 30; display: grid; grid-template-columns: minmax(340px, 44%) 1fr;
+  gap: var(--s-12); padding: var(--s-12) var(--s-16);
+  background:
+    radial-gradient(90% 70% at 8% 0%, var(--np-wash-a) 0%, transparent 60%),
+    radial-gradient(80% 80% at 100% 100%, var(--np-wash-b) 0%, transparent 58%),
+    linear-gradient(180deg, var(--np-top) 0%, var(--wyy-bg) 100%);
+  animation: wyy-np-in var(--t-slow) var(--ease);
+  overflow: hidden;
+}
+@keyframes wyy-np-in { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: none } }
+.wyy-np-left { display: flex; flex-direction: column; gap: var(--s-6); min-width: 0 }
+.wyy-np-art { width: 100%; aspect-ratio: 1; border-radius: var(--r-lg); object-fit: cover; box-shadow: 0 32px 72px -24px rgba(0, 0, 0, .6); transition: transform var(--t-slow) var(--ease) }
+.wyy-np-art.paused { transform: scale(.94) }
+.wyy-np-meta .t1 { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: 800; color: var(--art-on); text-wrap: balance }
+.wyy-np-meta .t2 { margin-top: var(--s-2); font-size: var(--fs-sub); line-height: var(--lh-sub); color: color-mix(in oklab, var(--art-on) 74%, transparent) }
+.wyy-np-ctl { display: flex; align-items: center; gap: var(--s-6); margin-top: var(--s-2) }
+.wyy-np-ctl .play { width: 56px; height: 56px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--art-on) 94%, transparent); color: var(--art-vivid); display: grid; place-items: center }
+.wyy-np-ctl .play:hover { transform: scale(1.05) }
+.wyy-np-right { min-width: 0; display: flex; flex-direction: column }
+.wyy-ly { flex: 1; overflow-y: auto; mask-image: linear-gradient(180deg, transparent, #000 12%, #000 84%, transparent); padding: 20vh 0 }
+.wyy-ly .l {
+  font-size: var(--fs-lyr); line-height: 1.28; font-weight: 700; color: var(--wyy-ly-off);
+  letter-spacing: 0; padding: var(--s-2) 0; transition: color var(--t-slow) var(--ease), filter var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
+  transform-origin: left center;
+}
+.wyy-ly .l.on { color: var(--wyy-ly-on); transform: scale(1.02) }
+.wyy-ly .l.next { color: color-mix(in oklab, var(--wyy-ly-on) 55%, transparent) }
+.wyy-ly .l .tr { display: block; font-size: var(--fs-sub); line-height: var(--lh-sub); font-weight: 500; margin-top: var(--s-1); color: color-mix(in oklab, var(--wyy-ly-off) 88%, transparent) }
+.wyy-ly .l.dim { filter: blur(.3px); opacity: .55 }
+
+/* ---------- 13. 空态 / 骨架 ---------- */
+.wyy-empty { display: grid; place-items: center; gap: var(--s-4); padding: var(--s-16) 0; color: var(--wyy-fg-3); text-align: center }
+.wyy-shimmer { position: relative; overflow: hidden; background: var(--wyy-surface-1); border-radius: var(--r-sm) }
+.wyy-shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--wyy-fg) 8%, transparent), transparent); animation: wyy-sh 1.4s linear infinite }
+@keyframes wyy-sh { from { transform: translateX(-100%) } to { transform: translateX(100%) } }
+
+/* ---------- 14. 取色面板（评审证据） ---------- */
+#tune { position: absolute; left: var(--s-4); right: var(--s-4); bottom: calc(var(--bar-h) + var(--s-4)); z-index: 20 }
+.tpanel {
+  background: var(--wyy-surface-2); border: 1px solid var(--wyy-border); border-radius: var(--r-md);
+  padding: var(--s-4); box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .5); max-height: 42vh; overflow: auto;
+}
+.tpanel .trow { display: grid; grid-template-columns: 34px minmax(0, 1.6fr) auto 150px 44px; gap: var(--s-3); align-items: center; padding: var(--s-2) 0; border-bottom: 1px solid var(--wyy-border); font-size: var(--fs-sm) }
+.tpanel .trow:last-of-type { border-bottom: none }
+.tpanel img { width: 34px; height: 34px; border-radius: var(--r-xs); object-fit: cover }
+.tpanel .tn2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--wyy-fg) }
+.tpanel .sws { display: flex; gap: 3px }
+.tpanel .sw { width: 22px; height: 22px; border-radius: var(--r-xs); border: 1px solid var(--wyy-border) }
+.tpanel .ct { font-variant-numeric: tabular-nums; color: var(--wyy-fg-3); font-size: var(--fs-meta) }
+.tpanel .note { margin-top: var(--s-3); font-size: var(--fs-meta); line-height: var(--lh-meta); color: var(--wyy-fg-3) }
+
+@media (max-width: 1080px) {
+  .wyy-np { grid-template-columns: 1fr; padding: var(--s-8) }
+  .wyy-np-art { max-width: 320px }
+  .wyy-band-art { width: 128px; height: 128px }
+  .wyy-row { grid-template-columns: 28px minmax(0, 3fr) 60px 40px }
+  .wyy-row .al { display: none }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "dsh-wyymusic",
+  "name": "网易云音乐",
+  "version": "0.2.0",
+  "description": "在 DeepSeek Harness 侧栏提供独立入口，点开后全屏接管主区域，内置自研网易云音乐播放界面（搜索 / 歌单 / 榜单 / 播放 / 逐字歌词）。",
+  "platform": "web",
+  "entry": "lib/index.js",
+  "client": "lib/client.js",
+  "license": "Apache-2.0",
+  "categories": [
+    "media",
+    "music"
+  ],
+  "capabilities": {
+    "webServer": true
+  }
+}

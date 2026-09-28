@@ -1,0 +1,54 @@
+{
+  "name": "dsh-wyymusic",
+  "version": "0.2.0",
+  "description": "DeepSeek Harness 网易云音乐 GUI 插件：侧栏独立入口 + 全屏接管式播放界面",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "dsh.plugin.json",
+    "cordis.patch.yml",
+    "LICENSE",
+    "NOTICE",
+    "LICENSE.dsh-music-player.txt",
+    "THIRD_PARTY_NOTICES.md",
+    "README.md"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "netease",
+    "music",
+    "wyymusic"
+  ],
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "i18n": "node scripts/i18n-check.mjs",
+    "smoke:host": "node scripts/smoke-host.mjs",
+    "smoke:client": "node scripts/smoke-client.mjs",
+    "harness": "node scripts/harness-ambient.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
+}
