@@ -1,6 +1,6 @@
 {
   "name": "dsh-wyymusic",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DeepSeek Harness 网易云音乐 GUI 插件：侧栏独立入口 + 全屏接管式播放界面",
   "type": "module",
   "main": "lib/index.js",

@@ -2,15 +2,16 @@
  * scripts/harness-ambient.mjs — 「音乐氛围编程」在真 harness + 真浏览器里的验收腿。
  *
  * 与 scripts/smoke-client.mjs 的分工：那条用 jsdom 证明"接线对了、开关真能开关"
- * （没有音频、没有排版、没有合成器）；这条证明另一半 —— 在**官方内核 0.1.7-rc.2**
- * 上对着**真音频**它真的在动，而且切到对话界面之后还在（"突破窗口"的核心证据）。
+ * （没有音频、没有排版、没有合成器）；这条证明另一半 —— 在**官方内核**（0.1.7-rc.2 与
+ * 0.2.0-rc.1 上都跑过）上对着**真音频**它真的在动，而且切到对话界面之后还在（"突破窗口"
+ * 的核心证据）。
  *
  * 断言里带反证的（不是"看起来在动"就过）：关总开关必须什么都不铺 / 关单个效果 overlay
  * 里必须真没了 / 范围切"对话栏"left 必须 >100px 而"整窗"必须 =0 / 连打不许刷屏 /
  * 音符必须自己消失 / 抽头 ok 但电平全 0 要能自愈。
  *
  * 前置：
- *   · 解出来的内核树（默认 %TEMP%/dsh-kernel-017rc2，DSH_KERNEL_DIR 覆盖）
+ *   · 解出来的内核树（默认 %TEMP%/dsh-kernel-020rc1，DSH_KERNEL_DIR 覆盖）
  *   · 一份可播的登录态（默认从 ~/.dsh/wyymusic/cookie.json **只读**拷进临时 home；
  *     那里没有就退回另一条腿在用的 %TEMP%/dshhome-official/wyymusic/cookie.json）
  *   · Edge（AMB_EDGE 覆盖）
@@ -31,7 +32,7 @@ import { fileURLToPath } from 'node:url'
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..')
 const T = process.env.TEMP || process.env.TMP || 'C:/Users/delinger/AppData/Local/Temp'
-const KERNEL = process.env.DSH_KERNEL_DIR || join(T, 'dsh-kernel-017rc2')
+const KERNEL = process.env.DSH_KERNEL_DIR || join(T, 'dsh-kernel-020rc1')
 const HOME = process.env.AMB_HOME || join(T, 'dshhome-amb')
 const PORT = Number(process.env.AMB_PORT || 55831)
 const CDP_PORT = Number(process.env.AMB_CDP_PORT || 9361)
@@ -394,21 +395,29 @@ try {
         art: page ? getComputedStyle(page).getPropertyValue('--art-vivid-l') : '',
         playing: (() => { const s = document.querySelector('.wyy-bar-title'); return s ? s.textContent : '' })(),
       }) })()`
+    const rows = await ev(`document.querySelectorAll('.wyy-row').length`)
+    // 取色是异步的、还要过一遍封面网络：**读单次快照就判是错的**。实测封面 CDN 会成片卡
+    // 6s 以上（data-art-diag 里 timeout 3~7 笔），旧写法在卡顿窗口里读到空串就红 ——
+    // 0.2.0-rc.1 上连红两次都是这样，而单独探针（网络缓过来）每次都能取到色。
+    // 现在最多等 30s 让它落定；"永远不落"仍然判红（这条腿量的是**取色能落**，不是延迟）。
+    const landed = await poll(`(() => { const el = document.querySelector('.wyy-amb-bg-root')
+      return el && el.style.getPropertyValue('--amb-c1-l') ? true : null })()`, 30000, 500)
     const a = await ev(readVars)
     let va = {}
     try { va = JSON.parse(a.v) } catch { /* ignore */ }
+    const diag = await ev(`(() => { const p = document.querySelector('.wyy-page'); return p ? p.getAttribute('data-art-diag') : null })()`)
     const same = await ev(`(() => { const norm = (v) => { const d = document.createElement('div'); d.style.color = v; document.body.appendChild(d); const c = getComputedStyle(d).color; d.remove(); return c };
       return norm(${JSON.stringify(va.c1)}) === norm(${JSON.stringify(va.art)}) })()`)
-    const rows = await ev(`document.querySelectorAll('.wyy-row').length`)
-    if ((rows.v || 0) > 1 && va.c1 !== '') {
+    if ((rows.v || 0) > 1 && landed === true && va.c1 !== '') {
       check('氛围取色与面板 L3 令牌同源（同一张封面 → 同一个色）', same.v === true,
         '氛围 --amb-c1-l=' + va.c1 + '，面板 --art-vivid-l=' + va.art + '（归一化后相同=' + same.v + '，曲目 ' + va.playing + '）')
       await ev(`document.querySelectorAll('.wyy-row')[1].click()`)
-      const changed = await poll(`(() => { const el = document.querySelector('.wyy-amb-bg-root'); if (!el) return null; const v = el.style.getPropertyValue('--amb-c1-l'); return (v && v !== ${JSON.stringify(va.c1)}) ? v : null })()`, 25000, 400)
+      const changed = await poll(`(() => { const el = document.querySelector('.wyy-amb-bg-root'); if (!el) return null; const v = el.style.getPropertyValue('--amb-c1-l'); return (v && v !== ${JSON.stringify(va.c1)}) ? v : null })()`, 30000, 400)
       check('换歌后氛围色真的换掉（取色跟着当前歌曲）', typeof changed === 'string' && changed !== va.c1,
         '第二首的 --amb-c1-l=' + changed + '（第一首是 ' + va.c1 + '）')
     } else {
-      check('氛围取色与面板 L3 令牌同源（同一张封面 → 同一个色）', false, '没有第二行可点或氛围层没色：' + JSON.stringify(va))
+      check('氛围取色与面板 L3 令牌同源（同一张封面 → 同一个色）', false,
+        '没有第二行可点或氛围层没色：' + JSON.stringify(va) + '，等 30s 落定=' + landed + '，取色计数=' + diag.v)
       check('换歌后氛围色真的换掉（取色跟着当前歌曲）', false, '前置不满足')
     }
   }

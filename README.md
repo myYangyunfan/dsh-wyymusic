@@ -8,11 +8,11 @@
 - 主区：`main` 槽位注册 `wyymusic` 页，点开即整块替换主区域，可随时切回会话
 - 音乐能力：**不调 CLI**。宿主半边直接走网易云 weapi/linuxapi/eapi，浏览器半边只打宿主的同源路由
 
-支持的内核：`@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供）。已实测 0.1.7-rc.2。
+支持的内核：`@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供）。已实测 0.1.7-rc.2 / 0.2.0-rc.1。
 
 ## 安装
 
-前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供；已实测 0.1.7-rc.2）。
+前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供；已实测 0.1.7-rc.2 / 0.2.0-rc.1）。
 包零运行时依赖 —— `react` 是 peer、`@deepseek-ai/dsh-client-ui-slots` 是宿主注入，都不用另装。
 
 在应用的**设置 → 插件**里填安装源（或让 agent 用 `plugin_manager` 装），装完**重启应用**
@@ -24,10 +24,10 @@
 | `https://github.com/myYangyunfan/dsh-wyymusic` | git | 可加 `#分支/标签` |
 | `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
 | `dsh-wyymusic` | npm registry | **尚未发布**，现在装会 404 |
-| `<绝对路径>/dsh-wyymusic-0.2.0.tgz` | tarball | `npm pack` 的产物，见下 |
+| `<绝对路径>/dsh-wyymusic-0.2.1.tgz` | tarball | `npm pack` 的产物，见下 |
 
 > ⚠️ git 源由 pnpm 经 `codeload.github.com` 拉包。实测**本机**这条线不通（`github.com` 的 git 协议正常、`codeload` 20s 超时），
-> 所以本机装请用 tarball：`npm pack` 出 `dsh-wyymusic-0.2.0.tgz`，把它的**绝对路径**填进插件页。codeload 通的机器上三种 git 写法都能用。
+> 所以本机装请用 tarball：`npm pack` 出 `dsh-wyymusic-0.2.1.tgz`，把它的**绝对路径**填进插件页。codeload 通的机器上三种 git 写法都能用。
 
 ### 开发联调：repo 直挂
 

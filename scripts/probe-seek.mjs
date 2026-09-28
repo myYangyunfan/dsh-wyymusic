@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url'
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..')
 const T = process.env.TEMP || process.env.TMP || 'C:/Users/delinger/AppData/Local/Temp'
-const KERNEL = process.env.DSH_KERNEL_DIR || join(T, 'dsh-kernel-017rc2')
+const KERNEL = process.env.DSH_KERNEL_DIR || join(T, 'dsh-kernel-020rc1')
 const HOME = process.env.SEEK_HOME || join(T, 'dshhome-seek')
 const PORT = Number(process.env.SEEK_PORT || 55841)
 const CDP_PORT = Number(process.env.SEEK_CDP_PORT || 9371)

@@ -8,11 +8,11 @@ Adds a dedicated "NetEase Cloud Music" entry to the DeepSeek Harness sidebar. Op
 - Main area: registers a `wyymusic` page in the `main` slot; opening it replaces the main area entirely, and you can switch back to the chat at any time
 - Music backend: **no CLI involved**. The host half talks to NetEase weapi/linuxapi/eapi directly; the browser half only calls same-origin routes on the host
 
-Supported kernel: `@deepseek-ai/dsh` ≥ 0.1.7 (`sidebar.panellist` has been available since 0.1.7). Tested on 0.1.7-rc.2.
+Supported kernel: `@deepseek-ai/dsh` ≥ 0.1.7 (`sidebar.panellist` has been available since 0.1.7). Tested on 0.1.7-rc.2 / 0.2.0-rc.1.
 
 ## Installation
 
-Prerequisite: host kernel `@deepseek-ai/dsh` ≥ 0.1.7 (tested on 0.1.7-rc.2).
+Prerequisite: host kernel `@deepseek-ai/dsh` ≥ 0.1.7 (tested on 0.1.7-rc.2 / 0.2.0-rc.1).
 The package has zero runtime dependencies — `react` is a peer dependency and `@deepseek-ai/dsh-client-ui-slots` is injected by the host, so neither needs to be installed separately.
 
 In the app's **Settings → Plugins**, paste an install source (or ask your agent to install it via `plugin_manager`), then **restart the app**
@@ -24,10 +24,10 @@ In the app's **Settings → Plugins**, paste an install source (or ask your agen
 | `https://github.com/myYangyunfan/dsh-wyymusic` | git | `#branch/tag` supported |
 | `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
 | `dsh-wyymusic` | npm registry | **not published yet** — will 404 |
-| `<absolute path>/dsh-wyymusic-0.2.0.tgz` | tarball | output of `npm pack`, see below |
+| `<absolute path>/dsh-wyymusic-0.2.1.tgz` | tarball | output of `npm pack`, see below |
 
 > ⚠️ git sources are fetched by pnpm through `codeload.github.com`. Measured on **this** machine that path is blocked (`github.com`'s git protocol works; `codeload` times out after 20s),
-> so on this machine install from the tarball: `npm pack` to produce `dsh-wyymusic-0.2.0.tgz`, then paste its **absolute path** into the plugin page. On machines where codeload is reachable, all three git forms work.
+> so on this machine install from the tarball: `npm pack` to produce `dsh-wyymusic-0.2.1.tgz`, then paste its **absolute path** into the plugin page. On machines where codeload is reachable, all three git forms work.
 
 ### Local development: linking the repo
 
