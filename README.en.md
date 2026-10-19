@@ -15,6 +15,18 @@ Supported kernel: `@deepseek-ai/dsh` ≥ 0.1.7 (`sidebar.panellist` has been ava
 > fail immediately (the kernel only reads it as an assembly-order hint), but it is published metadata that would become a hard failure
 > the day the kernel starts validating it.
 
+**What 0.2.2 changes** (adapting to 0.2.1-rc.2, each item verified on a real kernel; evidence in [`docs/kernel-compat-0.2.1.md`](docs/kernel-compat-0.2.1.md)):
+
+| Item | Change | Why |
+| --- | --- | --- |
+| `dsh.client.inject` | `…-ui-slots` → `…-ui-renderer` | the old name is not a plugin package in the new kernel (it is a static shell seed module), so naming it did nothing |
+| sidebar label | hard-coded Chinese → host locale thunk | the tooltip stayed Chinese on an English UI; only a locale-service change re-projects it |
+| ambient layer `order` | `0` → `-10` | same tier as the official toasts but registered later, so it painted above them and blended them with `mix-blend-mode` |
+| backdrop self-heal | check `isConnected` before reuse | after a host frame remount (HMR / layout rebuild) the old node is detached → the backdrop silently vanished for good |
+| home resolution | use the kernel's `dshHomePath` service | with an explicitly configured home, cookie/prefs would otherwise still land in `~/.dsh` |
+| plugin-page metadata | added `locale/{zh,en}.json` + `icon.svg` | the kernel does **not** read `dsh.plugin.json`; title/description/icon come only from these |
+| install | added `scripts/install.mjs` | fixes dependencies / bundles / junction in one idempotent step, with `--uninstall` |
+
 ## Installation
 
 Prerequisite: host kernel `@deepseek-ai/dsh` ≥ 0.1.7. The package has zero runtime dependencies — `react` is a peer dependency and

@@ -194,8 +194,7 @@
 
 ## 3. 必须改（lead 可直接照做）
 
-> **工作区状态（审计收尾时，2026-10-19）**：M1 已落地（`package.json` 的 `dsh.client.inject` 现为 `@deepseek-ai/dsh-client-ui-renderer`）；
-> M2、M3 未见落地（`exports` 仍无 `./locale/*.json` / `./icon`，`lib/client.js` 未改动）。本节保留"修复前"描述以便复核。
+> **工作区状态（2026-10-19 收尾，v0.2.2）**：M1/M2/M3 与 S1/S2/S3 **全部已落地**（逐条见文末「8. 落地状态」）。本节保留"修复前"描述以便复核。
 
 ### M1 — `package.json` 的 `dsh.client.inject` 指向了静态基座模块，等于没写
 
@@ -285,3 +284,20 @@ Select-String -Path "$R\dsh-client-ui-conversation\lib\client.js" -Pattern 'data
 # 4) dsh.plugin.json 是否被内核读取（预期：0 命中）
 Get-ChildItem "$R" -Recurse -Include *.js,*.ts,*.json | Select-String -Pattern 'dsh\.plugin\.json' -List
 ```
+## 8. 落地状态（lead 补记，2026-10-19）
+
+| 项 | 状态 | 落地位置 |
+| --- | --- | --- |
+| M1 `dsh.client.inject` | 已落地 | `package.json` → `@deepseek-ai/dsh-client-ui-renderer` |
+| M2 插件页元数据 | 已落地 | 新增 `locale/zh.json`、`locale/en.json`、`icon.svg`；`package.json` 增顶层 `icon` 与 `exports` 的 `./icon`、`./locale/*.json`，`files` 同步 |
+| M3 侧栏 label | 已落地 | `lib/client.js`：`inject` 增 `'locale'`、`ctx.locale.register('wyymusic', …)`、`label: () => panelLabel()`（thunk 走宿主 locale，取不到服务时退回插件自己的 `t('appName')`） |
+| S1 overlay order | 已落地 | `lib/client.js` 的 `shell.overlay` 注册项 `order: -10` |
+| S2 背景层自愈 | 已落地 | `lib/client.js` `ambBackdropSync()`：`node !== null && !node.isConnected` → 先 `ambBackdropUnmount()` 再重建 |
+| S3 home 解析 | 已落地 | `lib/index.js`：`dshHomePath(...segments)` 优先用 `ctx.get('dshHomePath')`，缺席退回 `$DSH_HOME` 或 `~/.dsh` |
+
+**落地后复验（真内核 0.2.1-rc.2，2026-10-19）**
+
+- `node scripts/probe-boot.mjs` → **7/7 PASS**，全程 console error / 未捕获异常 / 4xx·5xx = 0；侧栏「网易云音乐」仍在「插件」之上，点击后 `.wyy-page` 接管 main 槽，往返切换不炸。
+- `node scripts/probe-host-routes.mjs --search-param=q` → **12/12 PASS**（登录态 status、搜索、榜单、歌单、歌词、取链、`Range` 206 流、prefs GET/POST、404 兜底）。
+- `node scripts/i18n-check.mjs` → 通过（STR 152 条，表外中文字面量 0）。
+- 桌面组合（`dsh-base` + `dsh-web-app` + agent-team / auto-review / voice-input + ds-bot + vibe-island + inspector + better-sidebar + cover-pipeline + dsh-wyymusic）在隔离 home 里用**同名 bundle 列表的另一个 profile 名**启动成功：`/wyymusic/api/status` 200，index 注入行带 `inject:["@deepseek-ai/dsh-client-ui-renderer"]`。

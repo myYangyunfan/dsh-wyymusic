@@ -14,6 +14,18 @@
 > （`slots` 服务改由 `@deepseek-ai/dsh-client-ui-renderer` 提供），0.2.2 起改指后者。旧值不会立刻报错（内核只把它当装配顺序提示），
 > 但那是随包发布的陈旧元数据，一旦内核开始校验就是硬失败。
 
+**0.2.2 变更**（适配 0.2.1-rc.2，逐项真机验证过；逐条证据见 [`docs/kernel-compat-0.2.1.md`](docs/kernel-compat-0.2.1.md)）：
+
+| 项 | 改动 | 为什么 |
+| --- | --- | --- |
+| `dsh.client.inject` | `…-ui-slots` → `…-ui-renderer` | 前者在新内核里不是插件包（是 shell 的静态 seed 模块），指向它等于没写 |
+| 侧栏 label | 硬编码中文 → 宿主 locale thunk | 英文界面下 tooltip 一直是中文；只有 locale 服务变更才会重投影 |
+| 氛围层 `order` | `0` → `-10` | 与官方 toast 同档且后注册，会画在提示条之上并参与 `mix-blend-mode` 混色 |
+| 背景层自愈 | 重建前判 `isConnected` | 宿主 frame 重挂（HMR/布局重建）后旧节点已脱离文档 → 背景层静默永久消失 |
+| home 解析 | 改用内核 `dshHomePath` 服务 | 部署若改用「显式配置的 home」，cookie/prefs 才不会仍写进 `~/.dsh` |
+| 插件页元数据 | 新增 `locale/{zh,en}.json` + `icon.svg` | 内核**不读** `dsh.plugin.json`，标题/描述/图标只认这两样 |
+| 安装 | 新增 `scripts/install.mjs` | dependencies / bundles / junction 三处一次改对，幂等、可 `--uninstall` |
+
 ## 安装
 
 前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7。包零运行时依赖 —— `react` 是 peer、
