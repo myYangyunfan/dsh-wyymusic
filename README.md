@@ -8,42 +8,60 @@
 - 主区：`main` 槽位注册 `wyymusic` 页，点开即整块替换主区域，可随时切回会话
 - 音乐能力：**不调 CLI**。宿主半边直接走网易云 weapi/linuxapi/eapi，浏览器半边只打宿主的同源路由
 
-支持的内核：`@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供）。已实测 0.1.7-rc.2 / 0.2.0-rc.1。
+支持的内核：`@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供）。已实测 **0.2.1-rc.2**（Desktop 44.7.0，2026-10-19 全量复验）/ 0.2.0-rc.1 / 0.1.7-rc.2。
+
+> 0.2.1-rc.2 适配要点：`dsh.client.inject` 原先指向 `@deepseek-ai/dsh-client-ui-slots`，该包在新内核里**已不存在**
+> （`slots` 服务改由 `@deepseek-ai/dsh-client-ui-renderer` 提供），0.2.2 起改指后者。旧值不会立刻报错（内核只把它当装配顺序提示），
+> 但那是随包发布的陈旧元数据，一旦内核开始校验就是硬失败。
 
 ## 安装
 
-前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7（`sidebar.panellist` 自 0.1.7 起提供；已实测 0.1.7-rc.2 / 0.2.0-rc.1）。
-包零运行时依赖 —— `react` 是 peer、`@deepseek-ai/dsh-client-ui-slots` 是宿主注入，都不用另装。
+前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7。包零运行时依赖 —— `react` 是 peer、
+`@deepseek-ai/dsh-client-ui-renderer`（旧内核为 `-ui-slots`）由宿主注入，都不用另装。
 
-在应用的**设置 → 插件**里填安装源（或让 agent 用 `plugin_manager` 装），装完**重启应用**
-（页内注入清单只在宿主 ready 时抓一次，刷新页面无效）。内核接受的写法与实测结论：
+装完**必须重启应用**（bundle 列表与页内注入清单只在宿主启动时读一次，刷新页面无效）。
+
+### 一行装（本机/开发推荐）
+
+```sh
+node scripts/install.mjs            # 装进 $DSH_HOME/profiles/$DSH_PROFILE（默认 desktop）
+node scripts/install.mjs --dry-run  # 只打印将要改的三处
+node scripts/install.mjs --uninstall
+```
+
+它把内核加载所需的**三处**一次改对、幂等可重跑：profile 的 `dependencies` 写 `link:<repo 绝对路径>`、
+`dsh.profile.bundles` 追加 `dsh-wyymusic`、`node_modules/dsh-wyymusic` 建 junction 指向本仓库
+（旧链接指错目标会被拆掉重建，并备份 `package.json`）。**不跑 pnpm**，所以不会动 profile 里别的包，也不受网络影响。
+
+### 插件页安装
+
+在应用的**设置 → 插件**里填安装源（或让 agent 用 `plugin_manager` 装）。内核接受的写法与实测结论：
 
 | 安装源 | 内核认成 | 说明 |
 | --- | --- | --- |
+| `<本仓库的绝对路径>` | link | **本机最稳**，等同上面的一行装；改代码重启即生效 |
 | `github:myYangyunfan/dsh-wyymusic` | git | 可加 `#分支/标签` |
 | `https://github.com/myYangyunfan/dsh-wyymusic` | git | 可加 `#分支/标签` |
 | `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
 | `dsh-wyymusic` | npm registry | **尚未发布**，现在装会 404 |
-| `<绝对路径>/dsh-wyymusic-0.2.1.tgz` | tarball | `npm pack` 的产物，见下 |
+| `<绝对路径>/dsh-wyymusic-0.2.2.tgz` | tarball | `npm pack` 的产物 |
 
-> ⚠️ git 源由 pnpm 经 `codeload.github.com` 拉包。实测**本机**这条线不通（`github.com` 的 git 协议正常、`codeload` 20s 超时），
-> 所以本机装请用 tarball：`npm pack` 出 `dsh-wyymusic-0.2.1.tgz`，把它的**绝对路径**填进插件页。codeload 通的机器上三种 git 写法都能用。
+> ⚠️ 两种 git 写法都依赖 `github.com`/`codeload.github.com` 的连通性，**两条线在本机都不稳**
+> （实测会轮流出现 `RPC failed; HTTP 504` / `ERR_PNPM_FETCH_504`，报错出现在 pnpm 侧、与插件无关）。
+> 本机请优先用**绝对路径（link）**或 tarball；git 源留给网络正常的机器。
 
 ### 开发联调：repo 直挂
 
-改 repo 立即生效、不必重装（本机开发用）。把 repo 挂进 profile 的 `node_modules`：
+改 repo 立即生效、不必重装 —— 就是上面一行装的默认形态（junction 直挂）。
 
-```sh
-node -e "require('fs').symlinkSync(require('node:path').resolve('.'), process.env.USERPROFILE + '/.dsh/profiles/desktop/node_modules/dsh-wyymusic','junction')"
-```
-
-再把包名加进 `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles`，重启应用。
-
-> ⚠️ 该 profile 是 `nodeLinker: hoisted` 且 `dependencies` 里只有 `@dsh-pack/all`：**下次从插件页装/卸任何东西时，pnpm 会把不在依赖图里的 `node_modules` 条目清掉**，junction 被剪掉 —— 现象是重启后入口消失，重跑上面那条即可。
+> ⚠️ 该 profile 是 `nodeLinker: hoisted`：**下次从插件页装/卸任何东西时，pnpm 可能把不在它依赖图里的
+> `node_modules` 条目清掉**，junction 被剪掉 —— 现象是重启后入口消失。重跑 `node scripts/install.mjs` 即可
+> （`dependencies` 里已留 `link:` 条目，pnpm 下次也会照它重建）。
 
 > ⚠️ 覆盖**同一个路径**的 `.tgz` 后重装，pnpm 会说 `Already up to date` 不刷新（实测：先 `pnpm remove dsh-wyymusic` 再 add 才换新）。版本号变了就是新路径，不受影响。
 
-> 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内，不监听本地端口，没法直接 curl 它验；要单独跑起来验见下方「自检」。
+> 官方 Harness 的内核打包在 `resources/app.asar` 里、跑在 Electron 主进程内；`dsh` CLI **拒绝以 `--profile desktop` 启动**
+> （桌面 profile 由 Electron 应用独占）。要单独跑起来验见下方「自检」的 `probe:boot` / `probe:host`。
 
 ## 结构
 
@@ -120,15 +138,29 @@ node -e "require('fs').symlinkSync(require('node:path').resolve('.'), process.en
 node scripts/i18n-check.mjs        # 静态守卫：表外不许有中文字面量、STR 表必须两列
 node scripts/smoke-host.mjs        # 宿主半边：真实打网易云接口（18 项）
 node scripts/smoke-client.mjs      # 客户端半边：jsdom 里真渲染（48 项，含氛围层的开关与反证）
+node scripts/probe-host-routes.mjs # 真内核里打 12 条宿主路由（登录态/搜索/榜单/取链/Range 流/prefs/404）
+node scripts/probe-boot.mjs        # 真内核 + 真 Edge：启动图条目、侧栏入口、main 槽接管、全量报错
 node scripts/harness-ambient.mjs   # 氛围编程：真内核 + 真浏览器 + 真音频 + 动效 oracle + 真点击跳转（61 项，出 4 张截图）
 ```
 
-等价 `npm run i18n` / `smoke:host` / `smoke:client` / `harness`。排查"点了进度条不跳"这类只在实机出现的
+等价 `npm run i18n` / `smoke:host` / `smoke:client` / `probe:host` / `probe:boot` / `harness`。排查"点了进度条不跳"这类只在实机出现的
 问题时，用 `node scripts/probe-seek.mjs`（一次性探针：只打印观测值、不做断言）。
 
-后两条的分工：jsdom 没有音频/排版/合成器，只能证明接线与开关；`harness-ambient` 用解出来的
-内核树跑 `web` 模式（隔离 `DSH_HOME`，只读拷一份 cookie），验"对着真音乐它真的在动、切到对话
-界面后还在"。前置与坑见该脚本头部注释。
+后三条的分工：jsdom 没有音频/排版/合成器，只能证明接线与开关；`probe-boot` 不打桩 —— 页面是内核自己吐的
+index、`__DSH_BOOT__` 是内核自己组合的启动图、点击是真 DOM 点击，用来抓「换内核后到底哪一步漂移了」；
+`harness-ambient` 用解出来的内核树跑 `web` 模式（隔离 `DSH_HOME`，只读拷一份 cookie），验"对着真音乐它真的在动、
+切到对话界面后还在"。三条都要求一份**解出来的内核树**（`DSH_KERNEL_DIR`，默认 `D:/workspace/_dsh_kernel/dsh`）：
+
+```sh
+# 从已安装的 Desktop 里解出内核树（app.asar 是 Electron 归档，纯 node 读不了，需要 asar 工具）
+npx @electron/asar extract "C:/Users/<你>/AppData/Local/Programs/DeepSeek Harness/resources/app.asar" ./_dsh_kernel_raw
+# 再把 resources/app.asar.unpacked/dsh/* 覆盖进去（原生模块：node-pty / @img / koffi …）
+```
+
+前置与坑见各脚本头部注释。
+
+> 桌面 profile 由 Electron 应用独占（CLI 明确拒绝 `--profile desktop`），所以这三条真机腿都用**同 bundle 列表的另一个
+> profile 名**（如 `web`）在隔离 `DSH_HOME` 里跑，验完不影响真实安装。
 
 ## 合规
 

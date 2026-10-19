@@ -8,42 +8,63 @@ Adds a dedicated "NetEase Cloud Music" entry to the DeepSeek Harness sidebar. Op
 - Main area: registers a `wyymusic` page in the `main` slot; opening it replaces the main area entirely, and you can switch back to the chat at any time
 - Music backend: **no CLI involved**. The host half talks to NetEase weapi/linuxapi/eapi directly; the browser half only calls same-origin routes on the host
 
-Supported kernel: `@deepseek-ai/dsh` ≥ 0.1.7 (`sidebar.panellist` has been available since 0.1.7). Tested on 0.1.7-rc.2 / 0.2.0-rc.1.
+Supported kernel: `@deepseek-ai/dsh` ≥ 0.1.7 (`sidebar.panellist` has been available since 0.1.7). Verified on **0.2.1-rc.2** (Desktop 44.7.0, full re-check on 2026-10-19) / 0.2.0-rc.1 / 0.1.7-rc.2.
+
+> 0.2.1-rc.2 adaptation note: `dsh.client.inject` used to name `@deepseek-ai/dsh-client-ui-slots`, a package the new kernel
+> **no longer ships** (`slots` is now provided by `@deepseek-ai/dsh-client-ui-renderer`); 0.2.2 points at the latter. The stale value does not
+> fail immediately (the kernel only reads it as an assembly-order hint), but it is published metadata that would become a hard failure
+> the day the kernel starts validating it.
 
 ## Installation
 
-Prerequisite: host kernel `@deepseek-ai/dsh` ≥ 0.1.7 (tested on 0.1.7-rc.2 / 0.2.0-rc.1).
-The package has zero runtime dependencies — `react` is a peer dependency and `@deepseek-ai/dsh-client-ui-slots` is injected by the host, so neither needs to be installed separately.
+Prerequisite: host kernel `@deepseek-ai/dsh` ≥ 0.1.7. The package has zero runtime dependencies — `react` is a peer dependency and
+`@deepseek-ai/dsh-client-ui-renderer` (formerly `-ui-slots`) is injected by the host, so neither needs to be installed separately.
 
-In the app's **Settings → Plugins**, paste an install source (or ask your agent to install it via `plugin_manager`), then **restart the app**
-(the in-page injection manifest is fetched once when the host becomes ready; refreshing the page is not enough). Install specs the kernel accepts, with measured results:
+A **restart of the app is mandatory** afterwards (the bundle list and the in-page injection manifest are read once at host startup; refreshing the page is not enough).
+
+### One command (recommended on this machine / for development)
+
+```sh
+node scripts/install.mjs            # installs into $DSH_HOME/profiles/$DSH_PROFILE (default: desktop)
+node scripts/install.mjs --dry-run  # only prints the three changes it would make
+node scripts/install.mjs --uninstall
+```
+
+It fixes all **three** places the kernel needs, idempotently: `dependencies` in the profile manifest gets `link:<absolute repo path>`,
+`dsh.profile.bundles` gets `dsh-wyymusic` appended, and `node_modules/dsh-wyymusic` becomes a junction to this repo
+(a stale link pointing elsewhere is removed and rebuilt; the manifest is backed up). It **never runs pnpm**, so it touches no other
+package in the profile and cannot fail on network problems.
+
+### Installing from the plugin page
+
+In the app's **Settings → Plugins**, paste an install source (or ask your agent to install it via `plugin_manager`). Install specs the kernel accepts, with measured results:
 
 | Install source | Resolved as | Notes |
 | --- | --- | --- |
+| `<absolute path to this repo>` | link | **most reliable here**; same as the one-command install, edits apply after a restart |
 | `github:myYangyunfan/dsh-wyymusic` | git | `#branch/tag` supported |
 | `https://github.com/myYangyunfan/dsh-wyymusic` | git | `#branch/tag` supported |
 | `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
 | `dsh-wyymusic` | npm registry | **not published yet** — will 404 |
-| `<absolute path>/dsh-wyymusic-0.2.1.tgz` | tarball | output of `npm pack`, see below |
+| `<absolute path>/dsh-wyymusic-0.2.2.tgz` | tarball | output of `npm pack` |
 
-> ⚠️ git sources are fetched by pnpm through `codeload.github.com`. Measured on **this** machine that path is blocked (`github.com`'s git protocol works; `codeload` times out after 20s),
-> so on this machine install from the tarball: `npm pack` to produce `dsh-wyymusic-0.2.1.tgz`, then paste its **absolute path** into the plugin page. On machines where codeload is reachable, all three git forms work.
+> ⚠️ Both git forms depend on reaching `github.com` / `codeload.github.com`, and **both paths are flaky on this machine**
+> (measured alternating `RPC failed; HTTP 504` and `ERR_PNPM_FETCH_504`; the failure is on the pnpm/network side, not in the plugin).
+> Prefer the **absolute path (link)** or the tarball here; keep git sources for machines with working network.
 
 ### Local development: linking the repo
 
-Changes take effect immediately without reinstalling (used for development on this machine). Link the repo into the profile's `node_modules`:
+Changes take effect immediately without reinstalling — that is the default shape of the one-command install (a direct junction).
 
-```sh
-node -e "require('fs').symlinkSync(require('node:path').resolve('.'), process.env.USERPROFILE + '/.dsh/profiles/desktop/node_modules/dsh-wyymusic','junction')"
-```
-
-Then add the package name to `dsh.profile.bundles` in `~/.dsh/profiles/desktop/package.json` and restart the app.
-
-> ⚠️ That profile is `nodeLinker: hoisted` and its `dependencies` hold only `@dsh-pack/all`: **the next time you install or remove anything from the plugin page, pnpm prunes `node_modules` entries that aren't in the dependency graph** and cuts the junction — the symptom is the entry disappearing after a restart; just re-run the command above.
+> ⚠️ That profile is `nodeLinker: hoisted`: **the next time you install or remove anything from the plugin page, pnpm may prune
+> `node_modules` entries that are not in its dependency graph** and cut the junction — the symptom is the entry disappearing after a
+> restart. Re-run `node scripts/install.mjs` (the `link:` entry left in `dependencies` also lets pnpm rebuild it).
 
 > ⚠️ Re-installing a `.tgz` that **overwrites the same path** makes pnpm report `Already up to date` — it does not refresh (measured: `pnpm remove dsh-wyymusic` first, then add). A new version number is a new path and is unaffected.
 
-> The official Harness kernel is packed inside `resources/app.asar` and runs in the Electron main process. It listens on no local port, so you cannot curl it to verify; to run it standalone for verification, see "Self-checks" below.
+> The official Harness kernel is packed inside `resources/app.asar` and runs in the Electron main process; the `dsh` CLI **refuses to
+> boot `--profile desktop`** (the desktop profile is owned exclusively by the Electron app). To run it standalone for verification, see
+> `probe:boot` / `probe:host` under "Self-checks" below.
 
 ## Layout
 
@@ -118,15 +139,30 @@ Stored at `$DSH_HOME/wyymusic/cookie.json` (mode `0600`). Two ways to obtain it:
 node scripts/i18n-check.mjs        # static guard: no Chinese literals outside the table; STR tables must have both columns
 node scripts/smoke-host.mjs        # host half: hits the real NetEase API (18 checks)
 node scripts/smoke-client.mjs      # client half: real rendering in jsdom (48 checks, incl. ambient switches and disproofs)
+node scripts/probe-host-routes.mjs # real kernel: 12 host routes (login/search/charts/song URL/Range stream/prefs/404)
+node scripts/probe-boot.mjs        # real kernel + real Edge: boot graph entry, sidebar icon, main-slot takeover, all errors
 node scripts/harness-ambient.mjs   # ambient: real kernel + real browser + real audio + motion oracle + real click-to-seek (61 checks, 4 screenshots)
 ```
 
-Equivalent to `npm run i18n` / `smoke:host` / `smoke:client` / `harness`. When chasing problems that only appear on a real machine
+Equivalent to `npm run i18n` / `smoke:host` / `smoke:client` / `probe:host` / `probe:boot` / `harness`. When chasing problems that only appear on a real machine
 (like "clicking the progress bar doesn't jump"), use `node scripts/probe-seek.mjs` (a one-off probe: prints observations, asserts nothing).
 
-How the last two divide the work: jsdom has no audio / layout / compositor, so it can only prove wiring and toggles; `harness-ambient` extracts the
-kernel tree and runs it in `web` mode (isolated `DSH_HOME`, read-only cookie copy) to verify "it really moves with real music, and keeps moving after you
-switch to the chat view". Prerequisites and pitfalls are in that script's header comment.
+How the last three divide the work: jsdom has no audio / layout / compositor, so it can only prove wiring and toggles; `probe-boot` stubs nothing —
+the page is the index the kernel itself serves, `__DSH_BOOT__` is the graph the kernel itself composes, and the click is a real DOM click, which makes it
+the tool that pinpoints **which step drifted after a kernel upgrade**; `harness-ambient` extracts the kernel tree and runs it in `web` mode
+(isolated `DSH_HOME`, read-only cookie copy) to verify "it really moves with real music, and keeps moving after you switch to the chat view".
+All three need an **extracted kernel tree** (`DSH_KERNEL_DIR`, default `D:/workspace/_dsh_kernel/dsh`):
+
+```sh
+# Extract the kernel tree from the installed Desktop build (app.asar is an Electron archive; plain node cannot read it)
+npx @electron/asar extract "C:/Users/<you>/AppData/Local/Programs/DeepSeek Harness/resources/app.asar" ./_dsh_kernel_raw
+# Then overlay resources/app.asar.unpacked/dsh/* (native modules: node-pty / @img / koffi …)
+```
+
+Prerequisites and pitfalls are in each script's header comment.
+
+> The desktop profile is owned exclusively by the Electron app (the CLI explicitly refuses `--profile desktop`), so all three real-machine
+> legs boot a profile **with the same bundle list under a different name** (e.g. `web`) in an isolated `DSH_HOME`, leaving the real install untouched.
 
 ## Compliance
 
