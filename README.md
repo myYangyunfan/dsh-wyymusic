@@ -67,7 +67,7 @@ node scripts/install.mjs --uninstall
 | `https://github.com/myYangyunfan/dsh-wyymusic` | git | 可加 `#分支/标签` |
 | `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
 | `dsh-wyymusic` | npm registry | **尚未发布**，现在装会 404 |
-| `<绝对路径>/dsh-wyymusic-0.2.2.tgz` | tarball | `npm pack` 的产物 |
+| `<绝对路径>/dsh-wyymusic-0.2.3.tgz` | tarball | 本仓库每个 tag 由 GitHub Actions 自动 `npm pack` 并挂到该 release 附件（[workflow](.github/workflows/release-tarball.yml)）；也可本地 `npm pack` |
 
 > ⚠️ 两种 git 写法都依赖 `github.com`/`codeload.github.com` 的连通性，**两条线在本机都不稳**
 > （实测会轮流出现 `RPC failed; HTTP 504` / `ERR_PNPM_FETCH_504`，报错出现在 pnpm 侧、与插件无关）。

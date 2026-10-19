@@ -69,7 +69,7 @@ In the app's **Settings → Plugins**, paste an install source (or ask your agen
 | `https://github.com/myYangyunfan/dsh-wyymusic` | git | `#branch/tag` supported |
 | `git+https://github.com/myYangyunfan/dsh-wyymusic.git` | git | |
 | `dsh-wyymusic` | npm registry | **not published yet** — will 404 |
-| `<absolute path>/dsh-wyymusic-0.2.2.tgz` | tarball | output of `npm pack` |
+| `<absolute path>/dsh-wyymusic-0.2.3.tgz` | tarball | every tag is packed by GitHub Actions and attached to its release ([workflow](.github/workflows/release-tarball.yml)); `npm pack` locally works too |
 
 > ⚠️ Both git forms depend on reaching `github.com` / `codeload.github.com`, and **both paths are flaky on this machine**
 > (measured alternating `RPC failed; HTTP 504` and `ERR_PNPM_FETCH_504`; the failure is on the pnpm/network side, not in the plugin).
