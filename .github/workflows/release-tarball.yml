@@ -2,7 +2,7 @@ name: release-tarball
 
 # 为什么在远端打 tarball：插件页的安装源支持「tarball 的绝对路径」，
 # 而这个包没有发布到 npm registry，所以每个 release 都应该带一份 npm pack 产物。
-# 在 CI 里打并挂上去，就不依赖任何本机网络 / 本机到 uploads.github.com 的连通性。
+# 在 CI 里打并挂上去，就不依赖任何本机网络、也不依赖本机到 uploads.github.com 的连通性。
 on:
   push:
     tags:
@@ -58,10 +58,13 @@ jobs:
           TGZ: ${{ steps.pack.outputs.tgz }}
         run: |
           set -euo pipefail
+          # 先把清单落成文件再 grep：直接 tar -tzf | grep -q 会在首个命中时让 tar 收到 SIGPIPE，
+          # 配合 pipefail 就把「命中」判成失败（第一次跑正是栽在这）。
+          tar -tzf "$TGZ" > tarball-list.txt
           for f in package/package.json package/lib/index.js package/lib/client.js package/cordis.patch.yml package/dsh.plugin.json package/icon.svg package/locale/zh.json package/locale/en.json; do
-            tar -tzf "$TGZ" | grep -qx "$f" || { echo "missing: $f"; exit 1; }
+            grep -qx "$f" tarball-list.txt || { echo "missing: $f"; cat tarball-list.txt; exit 1; }
           done
-          echo "all expected entries present"
+          echo "all expected entries present ($(wc -l < tarball-list.txt) entries)"
 
       - name: Attach to release
         env:
@@ -75,8 +78,6 @@ jobs:
             gh release upload "$TAG" "$TGZ" --repo "$GITHUB_REPOSITORY" --clobber
           else
             echo "release $TAG missing — creating it with generated notes"
-            gh release create "$TAG" "$TGZ" --repo "$GITHUB_REPOSITORY" \
-              --title "dsh-wyymusic ${TAG#v}" --generate-notes
+            gh release create "$TAG" "$TGZ" --repo "$GITHUB_REPOSITORY" --title "dsh-wyymusic ${TAG#v}" --generate-notes
           fi
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets \
-            --jq '.assets[] | "\(.name)  \(.size) bytes"'
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[] | "${.name}  ${.size} bytes"' || true
