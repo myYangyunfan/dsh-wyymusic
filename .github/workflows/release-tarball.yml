@@ -1,0 +1,82 @@
+name: release-tarball
+
+# 为什么在远端打 tarball：插件页的安装源支持「tarball 的绝对路径」，
+# 而这个包没有发布到 npm registry，所以每个 release 都应该带一份 npm pack 产物。
+# 在 CI 里打并挂上去，就不依赖任何本机网络 / 本机到 uploads.github.com 的连通性。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要挂附件到哪个已存在的 tag（如 v0.2.3）'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-tarball-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  pack-and-attach:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # 打包前先过静态门：打出一个装不上的包比没有包更糟
+      - name: Static gates
+        run: |
+          set -euo pipefail
+          node --check lib/index.js
+          node --check lib/client.js
+          node scripts/i18n-check.mjs
+
+      - name: npm pack
+        id: pack
+        run: |
+          set -euo pipefail
+          npm pack
+          TGZ="$(ls -1 dsh-wyymusic-*.tgz | head -n1)"
+          echo "tgz=$TGZ" >> "$GITHUB_OUTPUT"
+          echo "--- tarball contents ---"
+          tar -tzf "$TGZ" | sort
+
+      - name: Verify tarball carries the kernel-facing files
+        env:
+          TGZ: ${{ steps.pack.outputs.tgz }}
+        run: |
+          set -euo pipefail
+          for f in package/package.json package/lib/index.js package/lib/client.js package/cordis.patch.yml package/dsh.plugin.json package/icon.svg package/locale/zh.json package/locale/en.json; do
+            tar -tzf "$TGZ" | grep -qx "$f" || { echo "missing: $f"; exit 1; }
+          done
+          echo "all expected entries present"
+
+      - name: Attach to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+          TGZ: ${{ steps.pack.outputs.tgz }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "release $TAG exists — uploading asset"
+            gh release upload "$TAG" "$TGZ" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            echo "release $TAG missing — creating it with generated notes"
+            gh release create "$TAG" "$TGZ" --repo "$GITHUB_REPOSITORY" \
+              --title "dsh-wyymusic ${TAG#v}" --generate-notes
+          fi
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets \
+            --jq '.assets[] | "\(.name)  \(.size) bytes"'
