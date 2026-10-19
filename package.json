@@ -1,6 +1,6 @@
 {
   "name": "dsh-wyymusic",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "DeepSeek Harness 网易云音乐 GUI 插件：侧栏独立入口 + 全屏接管式播放界面",
   "type": "module",
   "main": "lib/index.js",
@@ -53,6 +53,7 @@
     "smoke:client": "node scripts/smoke-client.mjs",
     "probe:boot": "node scripts/probe-boot.mjs",
     "probe:host": "node scripts/probe-host-routes.mjs",
+    "probe:security": "node scripts/probe-security.mjs",
     "harness": "node scripts/harness-ambient.mjs"
   },
   "dsh": {

@@ -26,6 +26,17 @@
 | 插件页元数据 | 新增 `locale/{zh,en}.json` + `icon.svg` | 内核**不读** `dsh.plugin.json`，标题/描述/图标只认这两样 |
 | 安装 | 新增 `scripts/install.mjs` | dependencies / bundles / junction 三处一次改对，幂等、可 `--uninstall` |
 
+**0.2.3 变更**（安全面，逐条真机验证）：
+
+| 项 | 改动 | 为什么 |
+| --- | --- | --- |
+| 路由守卫 | Host 白名单（非监听地址 403）+ 写操作同源（`Origin` / `Sec-Fetch-Site`） | 内核 webServer 路由零鉴权：挡 DNS rebinding 与跨站表单 POST（`/api/logout` 这类只看方法） |
+| body 上限 | `readBody` ≤ 64 KiB，超限 413 并断连 | 原实现 `for await` 无限收 body，本机 DoS 面 |
+| 流并发上限 | `/stream` 同时 ≤ 4 条，超出 429 | 多 `<audio>` 同时 seek / 循环取链会堆上游连接、白耗 VIP 取链权益 |
+| Cookie 上送 | `/stream` 不再带 cookie 取流 | 实测 6 个 CDN 节点带不带 cookie 都是 206/1024B；而直链是 `http://`，明文发 `MUSIC_U` 只是白给 |
+| 错误回传 | 500 只说 `internal error`（细节进日志）；502 只回末次状态码 | 原样透传上游/本机错误原文 = 情报泄露 |
+| 回归 | 新增 `scripts/probe-security.mjs`（8 条） | 该拒的拒了、该放的没被误伤，两者都要有人盯着 |
+
 ## 安装
 
 前置：宿主内核 `@deepseek-ai/dsh` ≥ 0.1.7。包零运行时依赖 —— `react` 是 peer、
@@ -121,6 +132,31 @@ node scripts/install.mjs --uninstall
 | `/wyymusic/stream` | GET | 音频流代理（带 cookie 取流后转出） |
 | 其他 | * | `404 {ok:false,error:"not found"}` |
 
+## 安全边界
+
+宿主半边是**同源代理**：浏览器不直连网易云（CORS + cookie），所有请求都打到宿主自己的 `/wyymusic/*`。
+内核的 `webServer` 路由表**不带任何鉴权**（它的 README 原话："It knows no harness concepts"），所以这些路由的
+第一道闸必须由插件自己立。0.2.3 起有下面四道：
+
+| 面 | 做什么 | 挡的是 |
+| --- | --- | --- |
+| Host 白名单 | 只接受内核实际监听的地址（+ `127.0.0.1` / `localhost` / `[::1]`），其余 403 | **DNS rebinding**：攻击者域名解析到 127.0.0.1 后，浏览器发来的 Host 仍是他的域名，而 GET 是简单请求、响应体照读 |
+| 写操作同源 | `POST` 必须有同源 `Origin`（或 `Sec-Fetch-Site: same-origin/none`）；`cross-site` 一律 403 | **跨站表单 POST**：这类请求不走 preflight，只看方法就能打 `/api/logout` |
+| body 上限 | JSON body ≤ 64 KiB，超限 413 并断开连接 | 任意大的 body 全收进内存（本机 DoS 面） |
+| 流并发上限 | `/stream` 同时最多 4 条上游流，超出 429 | 页面里多个 `<audio>` 同时 seek / 脚本循环取链 → 堆上游连接、白耗 VIP 取链权益、触发网易风控 |
+
+另外两条**凭据卫生**：
+
+- `/stream` **不再把 Cookie 发给上游 CDN**。实测（2026-10-20，VIP 登录态，lossless 直链）：同一份签名 URL 在
+  `m701/m702/m703/m801/m802/m803` 上「带 cookie」与「不带 cookie」都是 `206` + 同样的 1024 字节 —— 直链本身
+  就是签名授权的。网易返回的是 `http://` 直链，把 `MUSIC_U` 明文发出去只是白给（同网段可截获）。
+- 500 错误对外只说 `internal error`，细节进内核日志；502 只回末次状态码，不回上游错误原文（那是本机网络细节）。
+
+> ⚠️ 这些**不是身份认证**。绑到非回环地址时，同一网络里的人仍可直接调用这些接口（那是部署者的选择，插件不改绑定）。
+> 要真隔离，请把 webserver 绑回 `127.0.0.1`，或在前面挂带鉴权的反向代理。
+>
+> 回归：`node scripts/probe-security.mjs http://127.0.0.1:<port>`（8 条，既测「该拒的拒了」，也测「该放的没被误伤」）。
+
 ## 氛围编程（突破插件窗口）
 
 歌曲的氛围可以铺到**插件面板之外**的对话界面上。入口在音乐页**左栏下栏**：两个快捷开关
@@ -155,6 +191,7 @@ node scripts/i18n-check.mjs        # 静态守卫：表外不许有中文字面�
 node scripts/smoke-host.mjs        # 宿主半边：真实打网易云接口（18 项）
 node scripts/smoke-client.mjs      # 客户端半边：jsdom 里真渲染（48 项，含氛围层的开关与反证）
 node scripts/probe-host-routes.mjs # 真内核里打 12 条宿主路由（登录态/搜索/榜单/取链/Range 流/prefs/404）
+node scripts/probe-security.mjs     # 同源守卫 8 条（伪造 Host / 跨站 Origin / 超大 body / 误伤对照组）
 node scripts/probe-boot.mjs        # 真内核 + 真 Edge：启动图条目、侧栏入口、main 槽接管、全量报错
 node scripts/harness-ambient.mjs   # 氛围编程：真内核 + 真浏览器 + 真音频 + 动效 oracle + 真点击跳转（61 项，出 4 张截图）
 ```

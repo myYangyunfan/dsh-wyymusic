@@ -27,6 +27,17 @@ Supported kernel: `@deepseek-ai/dsh` ≥ 0.1.7 (`sidebar.panellist` has been ava
 | plugin-page metadata | added `locale/{zh,en}.json` + `icon.svg` | the kernel does **not** read `dsh.plugin.json`; title/description/icon come only from these |
 | install | added `scripts/install.mjs` | fixes dependencies / bundles / junction in one idempotent step, with `--uninstall` |
 
+**What 0.2.3 changes** (security surface, each item verified on a real kernel):
+
+| Item | Change | Why |
+| --- | --- | --- |
+| route guard | Host allowlist (non-bound addresses 403) + same-origin writes (`Origin` / `Sec-Fetch-Site`) | the kernel's webServer routes have zero auth: blocks DNS rebinding and cross-site form POSTs (which only need the method to hit `/api/logout`) |
+| body cap | `readBody` ≤ 64 KiB, otherwise 413 and the socket is dropped | the old `for await` buffered an unbounded body — a local DoS surface |
+| stream cap | at most 4 concurrent `/stream` upstreams, otherwise 429 | several `<audio>` elements seeking at once / URL loops pile up upstream connections and burn VIP fetch quota |
+| cookie forwarding | `/stream` no longer sends the cookie upstream | measured: 6 CDN nodes return 206/1024 B with or without it, and the URLs are `http://` — sending `MUSIC_U` in plaintext is pure loss |
+| error replies | 500 says `internal error` (detail goes to the log); 502 returns only the last status code | echoing upstream/local error text is information disclosure |
+| regression | added `scripts/probe-security.mjs` (8 checks) | both "rejects what it must" and "does not block what it must not" need a keeper |
+
 ## Installation
 
 Prerequisite: host kernel `@deepseek-ai/dsh` ≥ 0.1.7. The package has zero runtime dependencies — `react` is a peer dependency and
@@ -124,6 +135,32 @@ All registered on `webServer` under `prefix: /wyymusic` — same-origin, no CORS
 | `/wyymusic/stream` | GET | Audio stream proxy (fetches with cookie, then streams out) |
 | anything else | * | `404 {ok:false,error:"not found"}` |
 
+## Security boundaries
+
+The host half is a **same-origin proxy**: the browser never talks to NetEase directly (CORS + cookies), so every request goes to the
+host's own `/wyymusic/*`. The kernel's `webServer` route table carries **no authentication at all** (its README: "It knows no harness
+concepts"), so the first gate has to come from the plugin. Since 0.2.3 there are four:
+
+| Surface | What it does | What it blocks |
+| --- | --- | --- |
+| Host allowlist | Only the address the kernel actually bound (plus `127.0.0.1` / `localhost` / `[::1]`); anything else 403 | **DNS rebinding**: once an attacker domain resolves to 127.0.0.1 the browser still sends *their* Host, and GET is a simple request whose body is readable |
+| Same-origin writes | `POST` needs a same-origin `Origin` (or `Sec-Fetch-Site: same-origin/none`); `cross-site` gets 403 | **Cross-site form POST**: no preflight, and the method alone can hit `/api/logout` |
+| Body cap | JSON body ≤ 64 KiB, otherwise 413 and the connection is dropped | Buffering an arbitrarily large body in memory (local DoS surface) |
+| Stream cap | At most 4 concurrent upstream streams on `/stream`, otherwise 429 | Several `<audio>` elements seeking at once / scripts looping on song URLs → piled-up upstream connections, wasted VIP fetch quota, NetEase risk control |
+
+Plus two **credential-hygiene** rules:
+
+- `/stream` **no longer forwards the cookie to the upstream CDN**. Measured (2026-10-20, logged-in VIP, lossless): the same signed URL
+  returns `206` with the same 1024 bytes on `m701/m702/m703/m801/m802/m803` **with or without** the cookie — the URL itself is the
+  authorization. NetEase hands back `http://` URLs, so shipping `MUSIC_U` in plaintext only gives it away (readable on the same network).
+- A 500 now says `internal error` and logs the detail; a 502 returns only the last status code, never the upstream error text (that is local network detail).
+
+> ⚠️ None of this is **authentication**. Bound to a non-loopback address, anyone on that network can still call these endpoints (that is
+> the deployer's choice; the plugin does not change the binding). For real isolation bind the webserver back to `127.0.0.1` or put an
+> authenticating reverse proxy in front.
+>
+> Regression: `node scripts/probe-security.mjs http://127.0.0.1:<port>` (8 checks — both "rejects what it must" and "does not block what it must not").
+
 ## Ambient mode (breaking out of the plugin panel)
 
 A song's mood can spill onto the chat UI **outside the plugin panel**. The entry point is at the **bottom of the music page's left rail**: two quick toggles
@@ -156,6 +193,7 @@ node scripts/i18n-check.mjs        # static guard: no Chinese literals outside t
 node scripts/smoke-host.mjs        # host half: hits the real NetEase API (18 checks)
 node scripts/smoke-client.mjs      # client half: real rendering in jsdom (48 checks, incl. ambient switches and disproofs)
 node scripts/probe-host-routes.mjs # real kernel: 12 host routes (login/search/charts/song URL/Range stream/prefs/404)
+node scripts/probe-security.mjs     # 8 same-origin guard checks (forged Host / cross-site Origin / huge body / no-false-positive)
 node scripts/probe-boot.mjs        # real kernel + real Edge: boot graph entry, sidebar icon, main-slot takeover, all errors
 node scripts/harness-ambient.mjs   # ambient: real kernel + real browser + real audio + motion oracle + real click-to-seek (61 checks, 4 screenshots)
 ```
