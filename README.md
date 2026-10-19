@@ -86,10 +86,14 @@ node scripts/install.mjs --uninstall
 | 客户端 | `lib/client.js` | 侧栏图标 + 全屏 GUI（发现 / 排行榜 / 我的歌单 / 搜索 / 播放条 / 歌词） |
 | 客户端 | `lib/vendor/qrcode.mjs` | 扫码登录二维码 |
 
-仓库里另外两块：`design/`（原型 `proto.html` + 视觉方案 UI-PLAN.md + 差距台账 UI-GAP-LEDGER.md +
-氛围架构 AMBIENT.md + `shots/` 截图证据）、`scripts/`（四条自检腿 + 一次性探针 `probe-seek.mjs`）。
+仓库里另外三块：`design/`（原型 `proto.html` + 视觉方案 UI-PLAN.md + 差距台账 UI-GAP-LEDGER.md +
+氛围架构 AMBIENT.md + `shots/` 截图证据）、`scripts/`（自检腿 + 真机探针 `probe-boot` / `probe-host-routes` /
+一次性探针 `probe-seek`）、`docs/`（[内核兼容性审计](docs/kernel-compat-0.2.1.md) +
+[0.2.2 真机验收与截图](docs/verify-0.2.2.md)）。
 
 `dsh.plugin.json` / `cordis.patch.yml` 是自装载声明：包自己往 loader 插一行 `dsh-wyymusic`，**不写 profile 的 patch 层**。
+（注意：`dsh.plugin.json` 内核**不读**，插件页的标题/描述/图标来自 `locale/{zh,en}.json` 与 `icon.svg`。）
+`locale/` 与 `icon.svg` 只服务插件页展示；运行时文案仍走 `lib/client.js` 自己的 STR 表。
 
 ## 宿主路由
 

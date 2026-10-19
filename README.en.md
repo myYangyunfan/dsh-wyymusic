@@ -89,10 +89,14 @@ Changes take effect immediately without reinstalling — that is the default sha
 | Client | `lib/client.js` | Sidebar icon + full-screen GUI (discover / charts / my playlists / search / player bar / lyrics) |
 | Client | `lib/vendor/qrcode.mjs` | QR code for scan login |
 
-Two more trees live in the repo: `design/` (prototype `proto.html` + visual plan UI-PLAN.md + gap ledger UI-GAP-LEDGER.md +
-ambient architecture AMBIENT.md + `shots/` screenshot evidence) and `scripts/` (four self-check legs + the one-off probe `probe-seek.mjs`).
+Three more trees live in the repo: `design/` (prototype `proto.html` + visual plan UI-PLAN.md + gap ledger UI-GAP-LEDGER.md +
+ambient architecture AMBIENT.md + `shots/` screenshot evidence), `scripts/` (self-check legs + the real-kernel probes `probe-boot` /
+`probe-host-routes` + the one-off `probe-seek`), and `docs/` ([kernel compatibility audit](docs/kernel-compat-0.2.1.md) +
+[0.2.2 real-kernel verification with screenshots](docs/verify-0.2.2.md)).
 
 `dsh.plugin.json` / `cordis.patch.yml` form the self-loading declaration: the package inserts its own `dsh-wyymusic` line into the loader — it does **not** write into the profile's patch layer.
+(Note: the kernel **does not read** `dsh.plugin.json`; the plugin page's title/description/icon come from `locale/{zh,en}.json` and `icon.svg`.
+Those serve the plugin page only — runtime copy still comes from the STR table inside `lib/client.js`.)
 
 ## Host routes
 
